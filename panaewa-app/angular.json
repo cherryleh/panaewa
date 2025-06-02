@@ -16,7 +16,6 @@
             "outputPath": "dist/panaewa-app",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "baseHref": "/panaewa-app/",
             "polyfills": [
               "zone.js"
             ],
