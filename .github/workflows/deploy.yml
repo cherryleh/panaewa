@@ -3,28 +3,33 @@ name: Deploy Angular to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main  # or 'master' if you're using that
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd panaewa-app
+          npm install
 
-      - name: Build app
-        run: npm run build -- --configuration production
+      - name: Build Angular app
+        run: |
+          cd panaewa-app
+          npm run build -- --configuration production
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages 
-          folder: panaewa/dist/panaewa
+          branch: gh-pages
+          folder: panaewa-app/dist/panaewa-app  # double-check this matches your angular.json output path
