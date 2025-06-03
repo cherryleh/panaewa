@@ -38,6 +38,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/panaewa/",
               "budgets": [
                 {
                   "type": "initial",
