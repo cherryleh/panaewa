@@ -1,0 +1,67 @@
+<div class="dashboard-grid">
+
+    <!-- Rainfall -->
+    <div class="card rainfall-card rainfall">
+        <h3>Rainfall</h3>
+        <div class="rainfall-values">
+            <div class="rainfall-column">
+                <p class="value">{{ yesterdayData.rainfall }} <span class="unit">mm</span></p>
+                <p class="label">{{yesterday}}</p>
+            </div>
+            <div class="rainfall-column">
+                <p class="value">{{ lastMonthSummary.rainfall }} <span class="unit">mm</span></p>
+                <p class="label">{{lastMonth}}</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Temperature -->
+    <div class="card temperature-card temperature">
+      <h3>Temperature</h3>
+      <div class="temperature-values">
+        <div class="temperature-column">
+          <p class="value">{{ yesterdayData.tmean }}<span class="unit">°C</span></p>
+          <p class="label">{{yesterday}}</p>
+        </div>
+        <div class="temperature-column">
+          <p class="value">{{ lastMonthSummary.tmean }}<span class="unit">°C</span></p>
+          <p class="label">{{lastMonth}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card drought-card drought">
+        <h3>Drought Condition</h3>
+        <p class="value">{{ lastMonthSummary.drought }}</p>
+        <p class="label">{{lastMonth}}</p>
+    </div>
+
+    <!-- Humidity -->
+    <div class="card humidity-card humidity">
+        <h3>Humidity</h3>
+        <p class="value">{{ yesterdayData.humidity }}<span class="unit">%</span></p>
+        <p class="label">{{yesterday}}</p>
+    </div>
+
+    <!-- Wind -->
+    <div class="card wind-card wind">
+        <h3>Wind</h3>
+        <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }} <span class="unit">mph</span></p>
+        <p class="label">{{yesterday}}</p>
+    </div>
+
+    <!-- Vog -->
+    <div class="card vog-card vog">
+      <h3>Air Quality</h3>
+      <p class="value">{{vogLevel}}</p>
+      <p class="label">{{ yesterday }}</p>
+    </div>
+
+    <!-- Graph -->
+    <div class="graph-card graph">
+        <highcharts-chart [Highcharts]="Highcharts" [options]="rainfallChartOptions"
+            style="width: 100%; height: 450px; display: block;">
+        </highcharts-chart>
+    </div>
+</div>

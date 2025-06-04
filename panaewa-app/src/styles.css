@@ -5,4 +5,14 @@
 body, html {
   margin: 0;
   padding: 0;
+  background-color: #f5f6f9;
+  font-family: "Rubik", "Segoe UI", sans-serif;
+
+}
+
+a.nav-link {
+  all: unset;
+  color: black !important;
+  text-decoration: none !important;
+  cursor: pointer;
 }
