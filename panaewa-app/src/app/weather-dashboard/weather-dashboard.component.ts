@@ -33,11 +33,27 @@ export class WeatherDashboardComponent {
 
   vogLevel = 'Good';
 
+  // Static comparison values
+  dailyRainfallChange = '+8.5%';
+  monthlyRainfallChange = '-7.2%';
+
+  dailyTempDiff = '+0.5°C';
+  monthlyTempDiff = '+0.3°C';
+
   Highcharts: typeof Highcharts = Highcharts;
   rainfallChartOptions: Highcharts.Options = {
     title: { text: 'Last 7 Days Rainfall & Temperature' },
     xAxis: {
-      categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      categories: [
+        'May 28, 2025',
+        'May 29, 2025',
+        'May 30, 2025',
+        'May 31, 2025',
+        'June 1, 2025',
+        'June 2, 2025',
+        'June 3, 2025'
+      ],
+      title: { text: 'Date' }
     },
     yAxis: [{
       title: { text: 'Temperature (°C)' },
@@ -52,7 +68,7 @@ export class WeatherDashboardComponent {
       yAxis: 0,
       data: [24, 25, 26, 25, 24.5, 23.8, 24.2],
       color: '#f28e2c',
-      zIndex: 10, // Put line above bars
+      zIndex: 10,
       marker: {
         enabled: true,
         radius: 4
@@ -66,6 +82,6 @@ export class WeatherDashboardComponent {
       borderWidth: 0
     }]
   };
-
-  
 }
+
+

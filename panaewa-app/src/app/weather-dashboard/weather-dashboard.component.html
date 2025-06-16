@@ -2,34 +2,56 @@
 
     <!-- Rainfall -->
     <div class="card rainfall-card rainfall">
-        <h3>Rainfall</h3>
-        <div class="rainfall-values">
-            <div class="rainfall-column">
-                <p class="value">{{ yesterdayData.rainfall }} <span class="unit">mm</span></p>
-                <p class="label">{{yesterday}}</p>
-            </div>
-            <div class="rainfall-column">
-                <p class="value">{{ lastMonthSummary.rainfall }} <span class="unit">mm</span></p>
-                <p class="label">{{lastMonth}}</p>
-            </div>
+      <h3>Rainfall</h3>
+      <div class="rainfall-values">
+        <div class="rainfall-column">
+          <p class="value">
+            {{ yesterdayData.rainfall }}<span class="unit">mm</span>
+            <span class="comparison rain-comparison" [ngClass]="{'positive': dailyRainfallChange.startsWith('+'), 'negative': dailyRainfallChange.startsWith('-')}">
+              {{ dailyRainfallChange }}
+            </span>
+          </p>
+          <p class="label">{{ yesterday }}</p>
         </div>
+        <div class="rainfall-column">
+          <p class="value">
+            {{ lastMonthSummary.rainfall }}<span class="unit">mm</span>
+            <span class="comparison rain-comparison" [ngClass]="{'positive': monthlyRainfallChange.startsWith('+'), 'negative': monthlyRainfallChange.startsWith('-')}">
+              {{ monthlyRainfallChange }}
+            </span>
+          </p>
+          <p class="label">{{ lastMonth }}</p>
+        </div>
+      </div>
     </div>
-
 
     <!-- Temperature -->
     <div class="card temperature-card temperature">
       <h3>Temperature</h3>
       <div class="temperature-values">
         <div class="temperature-column">
-          <p class="value">{{ yesterdayData.tmean }}<span class="unit">°C</span></p>
-          <p class="label">{{yesterday}}</p>
+          <p class="value">
+            {{ yesterdayData.tmean }}<span class="unit">°C</span>
+            <span class="comparison" [ngClass]="{'positive': dailyTempDiff.startsWith('+'), 'negative': dailyTempDiff.startsWith('-')}">
+              {{ dailyTempDiff }}
+            </span>
+          </p>
+          <p class="label">{{ yesterday }}</p>
         </div>
         <div class="temperature-column">
-          <p class="value">{{ lastMonthSummary.tmean }}<span class="unit">°C</span></p>
-          <p class="label">{{lastMonth}}</p>
+          <p class="value">
+            {{ lastMonthSummary.tmean }}<span class="unit">°C</span>
+            <span class="comparison" [ngClass]="{'positive': monthlyTempDiff.startsWith('+'), 'negative': monthlyTempDiff.startsWith('-')}">
+              {{ monthlyTempDiff }}
+            </span>
+          </p>
+
+          <p class="label">{{ lastMonth }}</p>
         </div>
       </div>
     </div>
+
+
 
     <div class="card drought-card drought">
         <h3>Drought Condition</h3>
@@ -47,7 +69,7 @@
     <!-- Wind -->
     <div class="card wind-card wind">
         <h3>Wind</h3>
-        <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }} <span class="unit">mph</span></p>
+        <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }}<span class="unit">mph</span></p>
         <p class="label">{{yesterday}}</p>
     </div>
 

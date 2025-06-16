@@ -32,14 +32,18 @@
 }
 
 
-/* Card styling */
 .card, .graph-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically center contents */
+  align-items: center;      /* Horizontally center contents */
   background-color: #ffffff;
   border-radius: 0.75rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   padding: 1.25rem;
   transition: transform 0.2s ease-in-out;
 }
+
 
 
 .card h3 {
@@ -78,14 +82,25 @@
   margin-top: 1rem;
 }
 
+.rainfall-values,
+.temperature-values {
+  display: flex;
+  justify-content: space-between;
+  gap: 6rem; /* wider horizontal spacing */
+  margin-top: 1rem;
+}
+
+
 .rainfall-column {
   text-align: center;
   flex: 1;
 }
 
 .card .value {
-  font-size: 2.25rem;
+  font-size: 2.3vw;
   font-weight: 700;
+  white-space: nowrap; /* keep value + unit + comparison on one line */
+  display: inline-block;
 }
 
 .card .label {
@@ -104,13 +119,12 @@
 .temperature-values {
   display: flex;
   justify-content: space-between;
-  gap: 2rem;
   margin-top: 1rem;
 }
 
 .temperature-column {
   text-align: center;
-  flex: 1;
+  flex: 0 0 auto;
 }
 
 
@@ -150,4 +164,19 @@
   .graph {
     grid-column: span 2;
   }
+}
+
+.card .comparison {
+  font-size: 1.3vw;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.card .rain-comparison.positive {
+  color: green;
+}
+
+.card .rain-comparison.negative {
+  color: red;
 }
