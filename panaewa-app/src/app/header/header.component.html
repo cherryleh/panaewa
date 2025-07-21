@@ -1,12 +1,13 @@
 <header class="header">
   <div class="container">
     <h1 class="nav-link" routerLink="/">Title</h1>
-    <nav>
+    <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle navigation">
+      &#9776;
+    </button>
+    <nav [class.open]="menuOpen">
       <a class="nav-link" routerLink="/">Home</a>
       <a class="nav-link" routerLink="/weather-dashboard">Weather Dashboard</a>
-
-      <a>Resources</a>
-
+      <a class="nav-link">Resources</a>
     </nav>
   </div>
 </header>
