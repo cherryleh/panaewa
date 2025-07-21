@@ -58,7 +58,13 @@
         <p class="value">{{ lastMonthSummary.drought }}</p>
         <p class="label">{{lastMonth}}</p>
     </div>
-
+    <!-- Wind -->
+    <div class="card wind-card wind">
+        <h3>Wind</h3>
+        <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }}<span class="unit">mph</span></p>
+        <p class="label">{{yesterday}}</p>
+    </div>
+    <div class="small-cards-row">
     <!-- Humidity -->
     <div class="card humidity-card humidity">
         <h3>Humidity</h3>
@@ -66,12 +72,7 @@
         <p class="label">{{yesterday}}</p>
     </div>
 
-    <!-- Wind -->
-    <div class="card wind-card wind">
-        <h3>Wind</h3>
-        <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }}<span class="unit">mph</span></p>
-        <p class="label">{{yesterday}}</p>
-    </div>
+    
 
     <!-- Vog -->
     <div class="card vog-card vog">
@@ -79,7 +80,7 @@
       <p class="value">{{vogLevel}}</p>
       <p class="label">{{ yesterday }}</p>
     </div>
-
+    </div>
     <!-- Graph -->
     <div class="graph-card graph">
         <highcharts-chart [Highcharts]="Highcharts" [options]="rainfallChartOptions"
