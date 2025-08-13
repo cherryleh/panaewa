@@ -1,16 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { CommonModule } from '@angular/common';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+type RFTempPoint = { date: string; rf_sum: number; temp_mean: number; };
 
 @Component({
   selector: 'app-weather-dashboard',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule],
+  imports: [CommonModule, HighchartsChartModule, HttpClientModule],
   templateUrl: './weather-dashboard.component.html',
   styleUrls: ['./weather-dashboard.component.css']
 })
-export class WeatherDashboardComponent {
+  export class WeatherDashboardComponent implements OnInit {
+  constructor(private http: HttpClient) {}
   yesterdayData = {
     humidity: 78,
     tmean: 24.3,
@@ -40,48 +44,82 @@ export class WeatherDashboardComponent {
   dailyTempDiff = '+0.5°C';
   monthlyTempDiff = '+0.3°C';
 
-  Highcharts: typeof Highcharts = Highcharts;
+  
+
+Highcharts: typeof Highcharts = Highcharts;
+  updateFlag = false; // tells highcharts-angular to re-render
+
   rainfallChartOptions: Highcharts.Options = {
     title: { text: 'Last 7 Days Rainfall & Temperature' },
-    xAxis: {
-      categories: [
-        'May 28, 2025',
-        'May 29, 2025',
-        'May 30, 2025',
-        'May 31, 2025',
-        'June 1, 2025',
-        'June 2, 2025',
-        'June 3, 2025'
-      ],
-      title: { text: 'Date' }
-    },
-    yAxis: [{
-      title: { text: 'Temperature (°C)' },
-      opposite: false
-    }, {
-      title: { text: 'Rainfall (mm)' },
-      opposite: true
-    }],
-    series: [{
-      name: 'Temperature',
-      type: 'line',
-      yAxis: 0,
-      data: [24, 25, 26, 25, 24.5, 23.8, 24.2],
-      color: '#f28e2c',
-      zIndex: 10,
-      marker: {
-        enabled: true,
-        radius: 4
+    xAxis: { categories: [], title: { text: 'Date' } },
+    yAxis: [
+      { // 0: Temperature
+        title: { text: 'Temperature (°C)' },
+        opposite: false
+      },
+      { // 1: Rainfall
+        title: { text: 'Rainfall (mm)' },
+        opposite: true
       }
-    }, {
-      name: 'Rainfall',
-      type: 'column',
-      yAxis: 1,
-      data: [5, 0, 12, 3, 7, 15, 6],
-      color: '#007bff',
-      borderWidth: 0
-    }]
+    ],
+    tooltip: {
+      shared: true,
+      valueDecimals: 2
+    },
+    series: [
+      {
+        name: 'Temperature',
+        type: 'line',
+        yAxis: 0,
+        data: [],
+        zIndex: 10,
+        marker: { enabled: true, radius: 4 },
+        color: '#f28e2c',
+      },
+      {
+        name: 'Rainfall',
+        type: 'column',
+        yAxis: 1,
+        data: [],
+        borderWidth: 0,
+        color: '#007bff',
+      }
+    ]
   };
+
+  ngOnInit(): void {
+    // If the file is under /public, use the leading slash:
+    //   /public/rf_temp_timeseries.json  -> URL is '/rf_temp_timeseries.json'
+    // If it's under src/assets, use 'assets/rf_temp_timeseries.json'
+    const url = '/rf_temp_timeseries.json';
+
+    this.http.get<RFTempPoint[]>(url).subscribe({
+      next: (rows) => {
+        // Optional: sort by date just in case
+        const data = [...rows].sort((a, b) => a.date.localeCompare(b.date));
+
+        const categories = data.map(d =>
+          new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        );
+        const temps = data.map(d => Number(d.temp_mean));
+        const rain = data.map(d => Number(d.rf_sum));
+
+        this.rainfallChartOptions = {
+          ...this.rainfallChartOptions,
+          xAxis: { ...(this.rainfallChartOptions.xAxis as Highcharts.XAxisOptions), categories },
+          series: [
+            { ...(this.rainfallChartOptions.series?.[0] as Highcharts.SeriesLineOptions), data: temps },
+            { ...(this.rainfallChartOptions.series?.[1] as Highcharts.SeriesColumnOptions), data: rain }
+          ]
+        };
+
+        this.updateFlag = true;
+      },
+      error: (err) => {
+        console.error('Failed to load rf_temp_timeseries.json', err);
+      }
+    });
+  }
 }
 
 
