@@ -84,7 +84,7 @@ Highcharts: typeof Highcharts = Highcharts;
 
     ngOnInit(): void {
     // 1. Load rf_temp_timeseries.json
-    this.http.get<RFTempPoint[]>('/rf_temp_timeseries.json').subscribe({
+    this.http.get<RFTempPoint[]>('rf_temp_timeseries.json').subscribe({
       next: (rows) => {
         const data = [...rows].sort((a, b) => a.date.localeCompare(b.date));
         const categories = data.map(d =>
@@ -108,7 +108,7 @@ Highcharts: typeof Highcharts = Highcharts;
     });
 
     // 2. Load weather_vars.json
-    this.http.get<WeatherVars & { tmean_diff?: number; rf_pdiff?: number }>('/weather_vars.json').subscribe({
+    this.http.get<WeatherVars & { tmean_diff?: number; rf_pdiff?: number }>('weather_vars.json').subscribe({
       next: (vars) => {
         // Format yesterday
         this.yesterday = new Date(vars.YestYr, vars.YestMonth - 1, vars.YestDay)
