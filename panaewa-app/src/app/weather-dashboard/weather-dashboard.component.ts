@@ -2,47 +2,42 @@ import { Component, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { CommonModule } from '@angular/common';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 type RFTempPoint = { date: string; rf_sum: number; temp_mean: number; };
+type WeatherVars = {
+  YestYr: number;
+  YestMonth: number;
+  YestDay: number;
+  LastMonth: number;
+  LastMonthYr: number;
+  relative_humidity: number;
+  tmean_daily: number;
+  tmean_monthly: number;
+  rf_daily: number;
+  rf_monthly: number;
+};
 
 @Component({
   selector: 'app-weather-dashboard',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule, HttpClientModule],
+  imports: [CommonModule, HighchartsChartModule],
   templateUrl: './weather-dashboard.component.html',
   styleUrls: ['./weather-dashboard.component.css']
 })
   export class WeatherDashboardComponent implements OnInit {
   constructor(private http: HttpClient) {}
-  yesterdayData = {
-    humidity: 78,
-    tmean: 24.3,
-    rainfall: 12.5
-  };
+  yesterdayData = { humidity: 0, tmean: 0, rainfall: 0 };
+  yesterday = '';
+  lastMonth = '';
+  lastHourWind = { speed: 0, direction: '' }; // Placeholder (no data in JSON)
+  lastMonthSummary = { tmean: 0, rainfall: 0, drought: '' }; // Drought placeholder
+  vogLevel = 'Good'; // Placeholder until JSON has value
+  dailyRainfallChange = '';
+  monthlyRainfallChange = '';
+  dailyTempDiff = '';
+  monthlyTempDiff = '';
 
-  yesterday = 'June 3, 2025';
-  lastMonth = 'May 2025';
-
-  lastHourWind = {
-    speed: 10.2,
-    direction: 'NE'
-  };
-
-  lastMonthSummary = {
-    tmean: 25.1,
-    rainfall: 88.3,
-    drought: 'Moderate Drought'
-  };
-
-  vogLevel = 'Good';
-
-  // Static comparison values
-  dailyRainfallChange = '+8.5%';
-  monthlyRainfallChange = '-7.2%';
-
-  dailyTempDiff = '+0.5°C';
-  monthlyTempDiff = '+0.3°C';
 
   
 
@@ -54,11 +49,11 @@ Highcharts: typeof Highcharts = Highcharts;
     xAxis: { categories: [], title: { text: 'Date' } },
     yAxis: [
       { // 0: Temperature
-        title: { text: 'Temperature (°C)' },
+        title: { text: 'Temperature (°F)' },
         opposite: false
       },
       { // 1: Rainfall
-        title: { text: 'Rainfall (mm)' },
+        title: { text: 'Rainfall (in)' },
         opposite: true
       }
     ],
@@ -87,17 +82,11 @@ Highcharts: typeof Highcharts = Highcharts;
     ]
   };
 
-  ngOnInit(): void {
-    // If the file is under /public, use the leading slash:
-    //   /public/rf_temp_timeseries.json  -> URL is '/rf_temp_timeseries.json'
-    // If it's under src/assets, use 'assets/rf_temp_timeseries.json'
-    const url = '/rf_temp_timeseries.json';
-
-    this.http.get<RFTempPoint[]>(url).subscribe({
+    ngOnInit(): void {
+    // 1. Load rf_temp_timeseries.json
+    this.http.get<RFTempPoint[]>('/rf_temp_timeseries.json').subscribe({
       next: (rows) => {
-        // Optional: sort by date just in case
         const data = [...rows].sort((a, b) => a.date.localeCompare(b.date));
-
         const categories = data.map(d =>
           new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
         );
@@ -115,11 +104,53 @@ Highcharts: typeof Highcharts = Highcharts;
 
         this.updateFlag = true;
       },
-      error: (err) => {
-        console.error('Failed to load rf_temp_timeseries.json', err);
-      }
+      error: (err) => console.error('Failed to load rf_temp_timeseries.json', err)
     });
+
+    // 2. Load weather_vars.json
+    this.http.get<WeatherVars & { tmean_diff?: number; rf_pdiff?: number }>('/weather_vars.json').subscribe({
+      next: (vars) => {
+        // Format yesterday
+        this.yesterday = new Date(vars.YestYr, vars.YestMonth - 1, vars.YestDay)
+          .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+        // Format last month
+        this.lastMonth = new Date(vars.LastMonthYr, vars.LastMonth - 1, 1)
+          .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        // Yesterday's data
+        this.yesterdayData = {
+          humidity: vars.relative_humidity,
+          tmean: vars.tmean_daily,
+          rainfall: vars.rf_daily
+        };
+
+        // Last month summary
+        this.lastMonthSummary = {
+          tmean: vars.tmean_monthly,
+          rainfall: vars.rf_monthly,
+          drought: 'N/A'
+        };
+
+        // Temperature difference (with sign)
+        if (vars.tmean_diff !== undefined) {
+          const diff = vars.tmean_diff;
+          this.monthlyTempDiff = `${diff > 0 ? '+' : ''}${diff.toFixed(1)} °F`;
+        } else {
+          this.monthlyTempDiff = 'N/A';
+        }
+
+        // Rainfall percent difference (with sign)
+        if (vars.rf_pdiff !== undefined) {
+          const pdiff = vars.rf_pdiff;
+          this.monthlyRainfallChange = `${pdiff > 0 ? '+' : ''}${pdiff.toFixed(0)}%`;
+        } else {
+          this.monthlyRainfallChange = 'N/A';
+        }
+      },
+      error: (err) => console.error('Failed to load weather_vars.json', err)
+    });
+
+
   }
 }
-
-

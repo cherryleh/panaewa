@@ -6,7 +6,7 @@
       <div class="rainfall-values">
         <div class="rainfall-column">
           <p class="value">
-            {{ yesterdayData.rainfall }}<span class="unit">mm</span>
+            {{ yesterdayData.rainfall }}<span class="unit"> in</span>
             <span class="comparison rain-comparison" [ngClass]="{'positive': dailyRainfallChange.startsWith('+'), 'negative': dailyRainfallChange.startsWith('-')}">
               {{ dailyRainfallChange }}
             </span>
@@ -15,7 +15,7 @@
         </div>
         <div class="rainfall-column">
           <p class="value">
-            {{ lastMonthSummary.rainfall }}<span class="unit">mm</span>
+            {{ lastMonthSummary.rainfall }}<span class="unit"> in</span>
             <span class="comparison rain-comparison" [ngClass]="{'positive': monthlyRainfallChange.startsWith('+'), 'negative': monthlyRainfallChange.startsWith('-')}">
               {{ monthlyRainfallChange }}
             </span>
@@ -31,7 +31,7 @@
       <div class="temperature-values">
         <div class="temperature-column">
           <p class="value">
-            {{ yesterdayData.tmean }}<span class="unit">°C</span>
+            {{ yesterdayData.tmean }}<span class="unit">°F</span>
             <span class="comparison" [ngClass]="{'positive': dailyTempDiff.startsWith('+'), 'negative': dailyTempDiff.startsWith('-')}">
               {{ dailyTempDiff }}
             </span>
@@ -40,7 +40,7 @@
         </div>
         <div class="temperature-column">
           <p class="value">
-            {{ lastMonthSummary.tmean }}<span class="unit">°C</span>
+            {{ lastMonthSummary.tmean }}<span class="unit">°F</span>
             <span class="comparison" [ngClass]="{'positive': monthlyTempDiff.startsWith('+'), 'negative': monthlyTempDiff.startsWith('-')}">
               {{ monthlyTempDiff }}
             </span>
