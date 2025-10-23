@@ -1,12 +1,17 @@
 {
     "YestYr": 2025,
-    "YestMonth": 8,
-    "YestDay": 11,
-    "LastMonth": 7,
+    "YestMonth": 10,
+    "YestDay": 16,
+    "LastMonth": 9,
     "LastMonthYr": 2025,
-    "relative_humidity": 67.47982865021008,
-    "tmean_daily": 25.003360523897058,
-    "tmean_monthly": 25.03331596310399,
-    "rf_daily": 170.00936889648438,
-    "rf_monthly": 17527.69921875
+    "relative_humidity": 65.0,
+    "tmean_daily": 77.0,
+    "tmean_monthly": 78.0,
+    "tmean_diff": 1,
+    "rf_daily": 0.0,
+    "rf_monthly": 6.0,
+    "rf_pdiff": -29.0,
+    "wind_speed": 22.816788,
+    "wind_direction": "NE",
+    "drought": "Moderate Drought"
 }
