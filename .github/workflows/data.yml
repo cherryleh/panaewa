@@ -24,9 +24,10 @@ jobs:
 
       - name: Decode and Mask API Token
         run: |
-          API_SECRET=$(echo '${{ secrets.API_CONFIG_JSON }}' | base64 -d | tr -d '\n')
-          echo "::add-mask::$API_SECRET"  
-          echo "API_TOKEN=$API_SECRET" >> $GITHUB_ENV
+          # decode your GitHub Secret API_CONFIG_JSON
+          API_SECRET=$(echo "${{ secrets.API_CONFIG_JSON }}" | base64 -d | tr -d '\n')
+          echo "::add-mask::$API_SECRET"
+          echo "HCDP_API_KEY=$API_SECRET" >> $GITHUB_ENV
 
       - name: Run Python script with API Token
         working-directory: panaewa-app/scripts
