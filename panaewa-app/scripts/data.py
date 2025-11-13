@@ -17,6 +17,9 @@ header = {
     "Authorization": f"Bearer {API_TOKEN}",
     "Content-Type": "application/json"
 }
+
+print("HCDP_API_KEY loaded:", "yes" if os.getenv("HCDP_API_KEY") else "no")
+
 yestYr, yestMonth, yestDay = (datetime.today() + relativedelta(days=-1)).timetuple()[:3]
 
 lastMonth = (datetime.today() + relativedelta(months=-1)).month
