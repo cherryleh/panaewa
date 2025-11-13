@@ -7,6 +7,8 @@ import json
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
+from zoneinfo import ZoneInfo
+
 
 from dotenv import load_dotenv
 
@@ -20,10 +22,15 @@ header = {
 
 print("HCDP_API_KEY loaded:", "yes" if os.getenv("HCDP_API_KEY") else "no")
 
-yestYr, yestMonth, yestDay = (datetime.today() + relativedelta(days=-1)).timetuple()[:3]
+now_hst = datetime.now(ZoneInfo("Pacific/Honolulu"))
+yesterday_hst = now_hst - relativedelta(days=1)
 
-lastMonth = (datetime.today() + relativedelta(months=-1)).month
-lastMonthYr = (datetime.today() + relativedelta(months=-1)).year
+yestYr, yestMonth, yestDay = yesterday_hst.year, yesterday_hst.month, yesterday_hst.day
+
+last_month_hst = now_hst - relativedelta(months=1)
+lastMonth = last_month_hst.month
+lastMonthYr = last_month_hst.year
+
 
 def get_tif(url, file):
     print(f"Requesting: {url}")
@@ -156,7 +163,8 @@ for i in range(1, 8):
     rf_val = get_zonal_stats(rf_path)
     temp_val = get_zonal_stats(temp_path)
     
-    dt = datetime.today() + relativedelta(days=-i)
+    dt = now_hst - relativedelta(days=i)
+
 
     yestYr, yestMonth, yestDay = dt.timetuple()[:3]  # (year, month, day)
 
