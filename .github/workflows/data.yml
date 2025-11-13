@@ -1,0 +1,40 @@
+name: Run Data Processing
+
+on:
+  schedule:
+    - cron: '0 15 * * * ' 
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Decode and Mask API Token
+        run: |
+          API_SECRET=$(echo '${{ secrets.API_CONFIG_JSON }}' | base64 -d | tr -d '\n')
+          echo "::add-mask::$API_SECRET"  
+          echo "API_TOKEN=$API_SECRET" >> $GITHUB_ENV
+
+      - name: Run Python script with API Token
+        env:
+          API_TOKEN: ${{ env.HCDP_API_KEY }}
+        run: python scripts/data.py
+      - name: Commit and push updated data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add public/*.json
+          git commit -m "Update weather data"
+          git push

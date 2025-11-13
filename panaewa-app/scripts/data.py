@@ -8,8 +8,15 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
 
+from dotenv import load_dotenv
 
+load_dotenv()  # loads .env if present
+API_TOKEN = os.getenv("HCDP_API_KEY")
 
+header = {
+    "Authorization": f"Bearer {API_TOKEN}",
+    "Content-Type": "application/json"
+}
 yestYr, yestMonth, yestDay = (datetime.today() + relativedelta(days=-1)).timetuple()[:3]
 
 lastMonth = (datetime.today() + relativedelta(months=-1)).month
@@ -48,7 +55,7 @@ ranchshp = gpd.read_file('../data/panaewa.shp')
 rh_file=f"../data/relative_humidity_daily.tif"
 
 def get_zonal_stats(file):
-    with rasterio.open(rh_file) as src:
+    with rasterio.open(file) as src:
         affine = src.transform
         array = src.read(1)
         df_zonal_stats = pd.DataFrame(zonal_stats(ranchshp, array, affine=affine,nodata=src.nodata,stats = ['mean']))
@@ -85,7 +92,7 @@ elif spi3 <= -0.8:
 elif spi3 <= 0.5:
     drought = "Abnormally Dry"
 else:
-    drought = "None"
+    drought = "No"
 
 data = {
     "YestYr": yestYr,
@@ -127,8 +134,8 @@ def zonal_stat(array, affine, nodata, geodf, stat):
 
 records = []
 for i in range(1, 8):
-    rf_path   = os.path.join(rf_tpl, rf_tpl.format(i=i))
-    temp_path = os.path.join(temp_tpl, temp_tpl.format(i=i))
+    rf_path   = rf_tpl.format(i=i)
+    temp_path = temp_tpl.format(i=i)
 
     rf_val = None
     temp_val = None
