@@ -11,9 +11,8 @@
   position: relative;
   width: 100%;
   height: clamp(150px, 30vh, 300px);
-  background-image: url("../header.jpg");
   background-size: cover;
-  background-position: center 45%;
+  background-position: center 50%;
   background-repeat: no-repeat;
   border-bottom: 3px solid #ccc;
   display: flex;
