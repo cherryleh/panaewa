@@ -31,7 +31,7 @@ jobs:
       - name: Run Python script with API Token
         env:
           API_TOKEN: ${{ env.HCDP_API_KEY }}
-        run: python scripts/data.py
+        run: python panaewa-app/scripts/data.py
       - name: Commit and push updated data
         run: |
           git config user.name "github-actions"
