@@ -89,7 +89,7 @@ Highcharts: typeof Highcharts = Highcharts;
 
     ngOnInit(): void {
     // 1. Load rf_temp_timeseries.json
-    this.http.get<RFTempPoint[]>('rf_temp_timeseries.json').subscribe({
+    this.http.get<RFTempPoint[]>('https://raw.githubusercontent.com/cherryleh/panaewa/refs/heads/main/panaewa-app/public/rf_temp_timeseries.json').subscribe({
       next: (rows) => {
         const data = [...rows].sort((a, b) => a.date.localeCompare(b.date));
         const categories = data.map(d => {
@@ -117,7 +117,7 @@ Highcharts: typeof Highcharts = Highcharts;
       error: (err) => console.error('Failed to load rf_temp_timeseries.json', err)
     });
 
-      this.http.get<WeatherVars>('weather_vars.json').subscribe({
+      this.http.get<WeatherVars>('https://raw.githubusercontent.com/cherryleh/panaewa/refs/heads/main/panaewa-app/public/weather_vars.json').subscribe({
         next: (vars) => {
         // Format yesterday
         this.yesterday = new Date(vars.YestYr, vars.YestMonth - 1, vars.YestDay)
