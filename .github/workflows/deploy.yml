@@ -3,7 +3,11 @@ name: Deploy Angular to GitHub Pages
 on:
   push:
     branches:
-      - main  # or 'master' if you're using that
+      - main
+    paths:
+      - 'panaewa-app/public/*.json'   # redeploy when JSON changes
+      - 'panaewa-app/src/assets/*.json'
+      - 'panaewa-app/**' 
 
 jobs:
   build-deploy:
