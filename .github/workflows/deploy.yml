@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'panaewa-app/public/*.json'   # redeploy when JSON changes
-      - 'panaewa-app/src/assets/*.json'
-      - 'panaewa-app/**' 
+      - 'panaewa-app/public/**/*.json'
+      - 'panaewa-app/src/assets/**/*.json'
+      - 'panaewa-app/src/**/*'
 
 jobs:
   build-deploy:
