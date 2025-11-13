@@ -2,7 +2,7 @@ name: Run Data Processing
 
 on:
   schedule:
-    - cron: '0 15 * * * ' 
+    - cron: '0 15 * * *' 
   workflow_dispatch:
 
 jobs:
@@ -37,8 +37,8 @@ jobs:
 
       - name: List json files
         run: |
-        ls -l panaewa-app/public/*.json
-        cat panaewa-app/public/weather_vars.json
+          ls -l panaewa-app/public/*.json
+          cat panaewa-app/public/weather_vars.json
 
       - name: Commit and push updated data
         run: |
