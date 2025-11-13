@@ -1,0 +1,7 @@
+requests
+pandas
+geopandas
+rasterio
+rasterstats
+python-dateutil
+python-dotenv
