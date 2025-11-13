@@ -38,6 +38,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add public/*.json
+          git add ./panaewa-app/public/*.json
           git commit -m "Update weather data"
           git push
