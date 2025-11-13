@@ -34,6 +34,12 @@ jobs:
         env:
           API_TOKEN: ${{ env.HCDP_API_KEY }}
         run: python data.py
+
+      - name: List json files
+        run: |
+        ls -l panaewa-app/public/*.json
+        cat panaewa-app/public/weather_vars.json
+
       - name: Commit and push updated data
         run: |
           git config user.name "github-actions"
