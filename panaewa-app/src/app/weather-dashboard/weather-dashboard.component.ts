@@ -14,8 +14,13 @@ type WeatherVars = {
   relative_humidity: number;
   tmean_daily: number;
   tmean_monthly: number;
+  tmean_diff: number;
   rf_daily: number;
   rf_monthly: number;
+  rf_pdiff: number;
+  wind_speed: number;
+  wind_direction: string;
+  drought: string;
 };
 
 @Component({
@@ -30,7 +35,7 @@ type WeatherVars = {
   yesterdayData = { humidity: 0, tmean: 0, rainfall: 0 };
   yesterday = '';
   lastMonth = '';
-  lastHourWind = { speed: 0, direction: '' }; // Placeholder (no data in JSON)
+  lastHourWind = { speed: 10, direction: '' }; // Placeholder (no data in JSON)
   lastMonthSummary = { tmean: 0, rainfall: 0, drought: '' }; // Drought placeholder
   vogLevel = 'Good'; // Placeholder until JSON has value
   dailyRainfallChange = '';
@@ -87,9 +92,14 @@ Highcharts: typeof Highcharts = Highcharts;
     this.http.get<RFTempPoint[]>('rf_temp_timeseries.json').subscribe({
       next: (rows) => {
         const data = [...rows].sort((a, b) => a.date.localeCompare(b.date));
-        const categories = data.map(d =>
-          new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-        );
+        const categories = data.map(d => {
+          const [y, m, day] = d.date.split('-').map(Number);
+          return new Date(y, m - 1, day).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          });
+        });
+
         const temps = data.map(d => Number(d.temp_mean));
         const rain = data.map(d => Number(d.rf_sum));
 
@@ -107,9 +117,8 @@ Highcharts: typeof Highcharts = Highcharts;
       error: (err) => console.error('Failed to load rf_temp_timeseries.json', err)
     });
 
-    // 2. Load weather_vars.json
-    this.http.get<WeatherVars & { tmean_diff?: number; rf_pdiff?: number }>('weather_vars.json').subscribe({
-      next: (vars) => {
+      this.http.get<WeatherVars>('weather_vars.json').subscribe({
+        next: (vars) => {
         // Format yesterday
         this.yesterday = new Date(vars.YestYr, vars.YestMonth - 1, vars.YestDay)
           .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -125,17 +134,17 @@ Highcharts: typeof Highcharts = Highcharts;
           rainfall: vars.rf_daily
         };
 
-        // Last month summary
         this.lastMonthSummary = {
           tmean: vars.tmean_monthly,
           rainfall: vars.rf_monthly,
-          drought: 'N/A'
+          drought: vars.drought
         };
 
         // Temperature difference (with sign)
         if (vars.tmean_diff !== undefined) {
           const diff = vars.tmean_diff;
           this.monthlyTempDiff = `${diff > 0 ? '+' : ''}${diff.toFixed(1)} °F`;
+          console.log('Temp Diff:', this.monthlyTempDiff);
         } else {
           this.monthlyTempDiff = 'N/A';
         }

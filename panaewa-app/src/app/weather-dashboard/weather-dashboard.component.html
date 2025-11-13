@@ -32,9 +32,6 @@
         <div class="temperature-column">
           <p class="value">
             {{ yesterdayData.tmean }}<span class="unit">°F</span>
-            <span class="comparison" [ngClass]="{'positive': dailyTempDiff.startsWith('+'), 'negative': dailyTempDiff.startsWith('-')}">
-              {{ dailyTempDiff }}
-            </span>
           </p>
           <p class="label">{{ yesterday }}</p>
         </div>
