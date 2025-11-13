@@ -26,9 +26,20 @@ lastMonth = (datetime.today() + relativedelta(months=-1)).month
 lastMonthYr = (datetime.today() + relativedelta(months=-1)).year
 
 def get_tif(url, file):
+    print(f"Requesting: {url}")
     r = requests.get(url, headers=header)
-    open(file, 'wb').write(r.content)
-    return
+
+    print("HTTP status:", r.status_code)
+
+    if r.status_code != 200:
+        print("Response preview:", r.text[:300])
+        raise SystemExit("Download failed — server did not return a TIFF.")
+
+    with open(file, "wb") as f:
+        f.write(r.content)
+
+    print("Saved:", file, "(", os.path.getsize(file), "bytes )")
+
 
 for i in range(0, 7):
     rf_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay-i:02d}&datatype=rainfall&period=day&production=new'
