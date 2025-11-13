@@ -29,6 +29,7 @@ jobs:
           echo "API_TOKEN=$API_SECRET" >> $GITHUB_ENV
 
       - name: Run Python script with API Token
+        working-directory: panaewa-app/scripts
         env:
           API_TOKEN: ${{ env.HCDP_API_KEY }}
         run: python panaewa-app/scripts/data.py
