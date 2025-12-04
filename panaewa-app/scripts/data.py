@@ -49,10 +49,25 @@ def get_tif(url, file):
 
 
 for i in range(0, 7):
-    rf_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay-i:02d}&datatype=rainfall&period=day&production=new'
-    rf_file=f"../data/rainfall_daily_t-{i+1}.tif"
-    temp_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay-i:02d}&datatype=temperature&period=day&aggregation=mean'
-    temp_file=f"../data/tmean_daily_t-{i+1}.tif"
+    target_date = yesterday_hst - relativedelta(days=i)
+    yyyy = target_date.year
+    mm = target_date.month
+    dd = target_date.day
+
+    rf_url = (
+        f"https://api.hcdp.ikewai.org/raster?"
+        f"extent=statewide&date={yyyy}-{mm:02d}-{dd:02d}"
+        f"&datatype=rainfall&period=day&production=new"
+    )
+    rf_file = f"../data/rainfall_daily_t-{i+1}.tif"
+
+    temp_url = (
+        f"https://api.hcdp.ikewai.org/raster?"
+        f"extent=statewide&date={yyyy}-{mm:02d}-{dd:02d}"
+        f"&datatype=temperature&period=day&aggregation=mean"
+    )
+    temp_file = f"../data/tmean_daily_t-{i+1}.tif"
+
     get_tif(rf_url, rf_file)
     get_tif(temp_url, temp_file)
 
