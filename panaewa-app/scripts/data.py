@@ -9,12 +9,13 @@ from dateutil.relativedelta import relativedelta
 import os
 from zoneinfo import ZoneInfo
 
-
+ 
 from dotenv import load_dotenv
 
-load_dotenv()  # loads .env if present
+load_dotenv() 
 API_TOKEN = os.getenv("HCDP_API_KEY")
-
+data_path = './data'
+public_path = './public'
 header = {
     "Authorization": f"Bearer {API_TOKEN}",
     "Content-Type": "application/json"
@@ -38,7 +39,7 @@ def get_tif(url, file):
     print("HTTP status:", r.status_code)
 
     if r.status_code == 404:
-        print("→ Raster not available yet, skipping")
+        print("→ Raster not available, skipping")
         return False
 
     r.raise_for_status()
@@ -62,14 +63,14 @@ for i in range(0, 7):
         f"extent=statewide&date={yyyy}-{mm:02d}-{dd:02d}"
         f"&datatype=rainfall&period=day&production=new"
     )
-    rf_file = f"../data/rainfall_daily_t-{i+1}.tif"
+    rf_file = os.path.join(data_path, f"rainfall_daily_t-{i+1}.tif")
 
     temp_url = (
         f"https://api.hcdp.ikewai.org/raster?"
         f"extent=statewide&date={yyyy}-{mm:02d}-{dd:02d}"
         f"&datatype=temperature&period=day&aggregation=mean"
     )
-    temp_file = f"../data/tmean_daily_t-{i+1}.tif"
+    temp_file = os.path.join(data_path, f"tmean_daily_t-{i+1}.tif")
     try:
         get_tif(rf_url, rf_file)
     except Exception as e:
@@ -82,23 +83,23 @@ for i in range(0, 7):
         continue
 
 rh_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay:02d}&datatype=relative_humidity&period=day'
-rh_file=f"../data/relative_humidity_daily.tif"
+rh_file=os.path.join(data_path, "relative_humidity_daily.tif")
 get_tif(rh_url, rh_file)
 
 spi_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay:02d}&datatype=relative_humidity&period=day'
-spi3_file = f"../data/spi3.tif"
+spi3_file = os.path.join(data_path, "spi3.tif")
 get_tif(spi_url, spi3_file)
 
 temp_m_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={lastMonthYr}-{lastMonth:02d}&datatype=temperature&period=month&aggregation=mean'
-temp_m_file=f"../data/tmean_monthly.tif"
+temp_m_file=os.path.join(data_path, "tmean_monthly.tif")
 get_tif(temp_m_url, temp_m_file)
 
 rf_m_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={lastMonthYr}-{lastMonth:02d}&datatype=rainfall&period=month&production=new'
-rf_m_file=f"../data/rainfall_monthly.tif"
+rf_m_file=os.path.join(data_path, "rainfall_monthly.tif")
 get_tif(rf_m_url, rf_m_file)
 
-ranchshp = gpd.read_file('../data/panaewa.shp')
-rh_file=f"../data/relative_humidity_daily.tif"
+ranchshp = gpd.read_file(os.path.join(data_path, "panaewa.shp"))
+rh_file=os.path.join(data_path, "relative_humidity_daily.tif")
 
 def get_zonal_stats(file):
     with rasterio.open(file) as src:
@@ -109,20 +110,20 @@ def get_zonal_stats(file):
 
 relative_humidity = get_zonal_stats(rh_file)
 
-tmean_daily_file=f"../data/tmean_daily_t-1.tif"
+tmean_daily_file=os.path.join(data_path, "tmean_daily_t-1.tif")
 temp_daily = get_zonal_stats(tmean_daily_file)
 
 tmean_monthly = get_zonal_stats(temp_m_file)
 
-tmean_climo_file=f"../data/climatology/tmean_climo_{yestMonth:02d}.tif"
+tmean_climo_file=os.path.join(data_path, f"climatology/tmean_climo_{yestMonth:02d}.tif")
 tmean_climo = get_zonal_stats(tmean_climo_file)
 tmean_month_diff = (tmean_monthly-tmean_climo)
 
-rf_daily_file=f"../data/rainfall_daily_t-1.tif"
+rf_daily_file=os.path.join(data_path, "rainfall_daily_t-1.tif")
 rf_daily = get_zonal_stats(rf_daily_file)
 rf_monthly = get_zonal_stats(rf_m_file)
 
-rf_climo_file=f"../data/climatology/rf_climo_{lastMonth:02d}.tif"
+rf_climo_file=os.path.join(data_path, f"climatology/rf_climo_{lastMonth:02d}.tif")
 rf_climo = get_zonal_stats(rf_climo_file)
 rf_pdiff = (rf_monthly-rf_climo)/(rf_climo)
 
@@ -158,12 +159,12 @@ data = {
     "drought": f"{drought} Drought"
 }
 
-with open("../public/weather_vars.json", "w") as f_out:
+with open(os.path.join(public_path, "weather_vars.json"), "w") as f_out:
     json.dump(data, f_out, indent=4) 
 
 
-rf_tpl   = "../data/rainfall_daily_t-{i}.tif"
-temp_tpl = "../data/tmean_daily_t-{i}.tif"  
+rf_tpl   = os.path.join(data_path, "rainfall_daily_t-{i}.tif")
+temp_tpl = os.path.join(data_path, "tmean_daily_t-{i}.tif")  
 
 
 def zonal_stat(array, affine, nodata, geodf, stat):
@@ -204,6 +205,6 @@ for i in range(1, 8):
 
 records.sort(key=lambda r: r["date"])
 
-with open("../public/rf_temp_timeseries.json", "w") as f:
+with open(os.path.join(public_path, "rf_temp_timeseries.json"), "w") as f:
     json.dump(records, f, indent=2)
 
