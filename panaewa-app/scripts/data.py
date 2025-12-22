@@ -14,8 +14,8 @@ from dotenv import load_dotenv
 
 load_dotenv() 
 API_TOKEN = os.getenv("HCDP_API_KEY")
-data_path = './data'
-public_path = './public'
+data_path = '../data'
+public_path = '../public'
 header = {
     "Authorization": f"Bearer {API_TOKEN}",
     "Content-Type": "application/json"
