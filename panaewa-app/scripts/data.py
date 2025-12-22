@@ -179,19 +179,25 @@ for i in range(1, 8):
 
     rf_val = None
     temp_val = None
-    rf_val = get_zonal_stats(rf_path)
-    temp_val = get_zonal_stats(temp_path)
-    
+
+    try:
+        rf_val = get_zonal_stats(rf_path)
+    except Exception:
+        pass
+
+    try:
+        temp_val = get_zonal_stats(temp_path)
+    except Exception:
+        pass
+
     dt = now_hst - relativedelta(days=i)
-
-
-    yestYr, yestMonth, yestDay = dt.timetuple()[:3]  # (year, month, day)
 
     records.append({
         "date": dt.strftime("%Y-%m-%d"),
-        "rf_sum": rf_val/25.4,        # sum over polygon(s); float if one polygon else list
-        "temp_mean": (temp_val* 9/5) + 32    # mean over polygon(s); float if one polygon else list
+        "rf_sum": None if rf_val is None else rf_val / 25.4,
+        "temp_mean": None if temp_val is None else (temp_val * 9/5) + 32
     })
+
 
 records.sort(key=lambda r: r["date"])
 
