@@ -67,9 +67,16 @@ for i in range(0, 7):
         f"&datatype=temperature&period=day&aggregation=mean"
     )
     temp_file = f"../data/tmean_daily_t-{i+1}.tif"
-
-    get_tif(rf_url, rf_file)
-    get_tif(temp_url, temp_file)
+    try:
+        get_tif(rf_url, rf_file)
+    except Exception as e:
+        print(f"Failed to download {rf_file}: {e}")
+        continue
+    try:
+        get_tif(temp_url, temp_file)
+    except Exception as e:
+        print(f"Failed to download {temp_file}: {e}")
+        continue
 
 rh_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay:02d}&datatype=relative_humidity&period=day'
 rh_file=f"../data/relative_humidity_daily.tif"
@@ -150,9 +157,6 @@ data = {
 
 with open("../public/weather_vars.json", "w") as f_out:
     json.dump(data, f_out, indent=4) 
-
-
-
 
 
 rf_tpl   = "../data/rainfall_daily_t-{i}.tif"
