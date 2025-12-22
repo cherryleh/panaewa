@@ -100,8 +100,17 @@ Highcharts: typeof Highcharts = Highcharts;
           });
         });
 
-        const temps = data.map(d => Number(d.temp_mean));
-        const rain = data.map(d => Number(d.rf_sum));
+        const temps = data.map(d =>
+          d.temp_mean === null || d.temp_mean === undefined
+            ? null
+            : Number(d.temp_mean)
+        );
+
+        const rain = data.map(d => 
+          d.rf_sum === null || d.rf_sum === undefined
+            ? null
+            : Number(d.rf_sum)
+        );
 
         this.rainfallChartOptions = {
           ...this.rainfallChartOptions,
