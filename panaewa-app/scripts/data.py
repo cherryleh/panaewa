@@ -35,17 +35,20 @@ lastMonthYr = last_month_hst.year
 def get_tif(url, file):
     print(f"Requesting: {url}")
     r = requests.get(url, headers=header)
-
     print("HTTP status:", r.status_code)
 
-    if r.status_code != 200:
-        print("Response preview:", r.text[:300])
-        raise SystemExit("Download failed — server did not return a TIFF.")
+    if r.status_code == 404:
+        print("→ Raster not available yet, skipping")
+        return False
+
+    r.raise_for_status()
 
     with open(file, "wb") as f:
         f.write(r.content)
 
     print("Saved:", file, "(", os.path.getsize(file), "bytes )")
+    return True
+
 
 
 for i in range(0, 7):
