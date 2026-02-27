@@ -26,13 +26,17 @@ jobs:
         run: |
           # decode your GitHub Secret API_CONFIG_JSON
           API_SECRET=$(echo "${{ secrets.API_CONFIG_JSON }}" | base64 -d | tr -d '\n')
+          AIR_SECRET = $(echo "${{ secrets.AIRNOW }}" | base64 -d | tr -d '\n')
           echo "::add-mask::$API_SECRET"
           echo "HCDP_API_KEY=$API_SECRET" >> $GITHUB_ENV
+          echo "::add-mask::$AIR_SECRET"
+          echo "AIRNOW_KEY=$AIR_SECRET" >> $GITHUB_ENV
 
       - name: Run Python script with API Token
         working-directory: panaewa-app/scripts
         env:
           API_TOKEN: ${{ env.HCDP_API_KEY }}
+          AIRNOW_KEY: ${{ env.AIRNOW_KEY }}
         run: python data.py
 
       - name: List json files
