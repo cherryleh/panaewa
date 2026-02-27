@@ -5,8 +5,7 @@
   gap: 0.5rem;
   padding: 1rem;
   box-sizing: border-box;
-  max-width: 80vw; 
-  overflow-x: hidden;
+  max-width: 80vw;
   margin-left: auto;
   margin-right: auto;
 }
@@ -244,4 +243,143 @@
 
 .card .label {
   white-space: nowrap;
+}
+
+
+
+.info-btn {
+  position: relative;
+}
+
+.info-btn .tooltip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  right: auto;
+  transform: translateY(-50%);
+
+  width: 240px;
+  max-width: min(260px, 70vw);
+
+  padding: 10px 12px;
+  border-radius: 10px;
+
+  background: rgba(0, 0, 0, 0.86);
+  color: #fff;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 120ms ease, visibility 120ms ease;
+
+  z-index: 9999;
+}
+
+.info-btn .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  transform: translateY(-50%);
+
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid rgba(0, 0, 0, 0.86);
+}
+
+.info-btn:hover .tooltip,
+.info-btn:focus-visible .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+/* Don’t clip the tooltip on this card */
+.card.vog-card {
+  overflow: visible; /* overrides .card overflow hidden */
+}
+
+.card.vog-card .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0.25rem;
+}
+
+.card.vog-card .card-header h3 {
+  margin: 0;
+  line-height: 1;
+}
+
+.card.vog-card .inline-header .card-title {
+  margin: 0;
+  line-height: 1;
+}
+
+
+.card.vog-card .info-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: #fff;
+  color: rgba(0, 0, 0, 0.7);
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  padding: 0;
+  margin: 0;
+  cursor: help;
+
+  position: relative;
+}
+
+.card.vog-card .info-btn .tooltip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+  width: 240px;
+  max-width: min(260px, 70vw);
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f3f4f6;             /* or #f3f4f6 for light gray */
+  color: #111;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.card.vog-card .info-btn .tooltip {
+  pointer-events: auto;           /* was none */
+}
+
+.card.vog-card .info-btn:hover .tooltip,
+.card.vog-card .info-btn:focus-visible .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.card.vog-card .info-btn .tooltip:hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Make sure it's actually able to receive hover events */
+.card.vog-card .info-btn {
+  cursor: help;
 }

@@ -21,6 +21,7 @@ type WeatherVars = {
   wind_speed: number;
   wind_direction: string;
   drought: string;
+  air_quality: string
 };
 
 @Component({
@@ -32,7 +33,7 @@ type WeatherVars = {
 })
   export class WeatherDashboardComponent implements OnInit {
   constructor(private http: HttpClient) {}
-  yesterdayData = { humidity: 0, tmean: 0, rainfall: 0 };
+  yesterdayData = { humidity: 0, tmean: 0, rainfall: 0, airQuality: '' };
   yesterday = '';
   lastMonth = '';
   lastHourWind = { speed: 10, direction: '' }; // Placeholder (no data in JSON)
@@ -44,7 +45,7 @@ type WeatherVars = {
   monthlyTempDiff = '';
 
 
-  
+
 
 Highcharts: typeof Highcharts = Highcharts;
   updateFlag = false; // tells highcharts-angular to re-render
@@ -106,7 +107,7 @@ Highcharts: typeof Highcharts = Highcharts;
             : Number(d.temp_mean)
         );
 
-        const rain = data.map(d => 
+        const rain = data.map(d =>
           d.rf_sum === null || d.rf_sum === undefined
             ? null
             : Number(d.rf_sum)
@@ -128,19 +129,18 @@ Highcharts: typeof Highcharts = Highcharts;
 
       this.http.get<WeatherVars>('https://raw.githubusercontent.com/cherryleh/panaewa/refs/heads/main/panaewa-app/public/weather_vars.json').subscribe({
         next: (vars) => {
-        // Format yesterday
         this.yesterday = new Date(vars.YestYr, vars.YestMonth - 1, vars.YestDay)
           .toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-        // Format last month
         this.lastMonth = new Date(vars.LastMonthYr, vars.LastMonth - 1, 1)
           .toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-        // Yesterday's data
+
         this.yesterdayData = {
           humidity: vars.relative_humidity,
           tmean: vars.tmean_daily,
-          rainfall: vars.rf_daily
+          rainfall: vars.rf_daily,
+          airQuality: vars.air_quality
         };
 
         this.lastMonthSummary = {
