@@ -129,13 +129,13 @@ rf_pdiff = (rf_monthly-rf_climo)/(rf_climo)
 
 spi3 = get_zonal_stats(spi3_file)
 if spi3 <= -2.0:
-    drought = "Exceptional"
+    drought = "Exceptional Drought"
 elif spi3 <= -1.6:
-    drought = "Extreme"
+    drought = "Extreme Drought"
 elif spi3 <= -1.3:
-    drought = "Severe"
+    drought = "Severe Drought"
 elif spi3 <= -0.8:
-    drought = "Moderate"
+    drought = "Moderate Drought"
 elif spi3 <= 0.5:
     drought = "Abnormally Dry"
 else:
@@ -156,7 +156,7 @@ data = {
     "rf_pdiff": round(rf_pdiff*100,0),
     "wind_speed": 10,
     "wind_direction": "NE",
-    "drought": f"{drought} Drought"
+    "drought": f"{drought}"
 }
 
 with open(os.path.join(public_path, "weather_vars.json"), "w") as f_out:
