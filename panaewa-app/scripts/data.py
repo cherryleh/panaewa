@@ -9,10 +9,10 @@ from dateutil.relativedelta import relativedelta
 import os
 from zoneinfo import ZoneInfo
 
- 
+
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 API_TOKEN = os.getenv("HCDP_API_KEY")
 data_path = '../data'
 public_path = '../public'
@@ -86,7 +86,7 @@ rh_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{ye
 rh_file=os.path.join(data_path, "relative_humidity_daily.tif")
 get_tif(rh_url, rh_file)
 
-spi_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay:02d}&datatype=relative_humidity&period=day'
+spi_url = f'https://api.hcdp.ikewai.org/raster?date={yestYr}-{lastMonth:02d}&datatype=spi&timescale=timescale003&period=month'
 spi3_file = os.path.join(data_path, "spi3.tif")
 get_tif(spi_url, spi3_file)
 
@@ -154,17 +154,17 @@ data = {
     "rf_daily": round(rf_daily/25.4,0),
     "rf_monthly": round(rf_monthly/25.4,0),
     "rf_pdiff": round(rf_pdiff*100,0),
-    "wind_speed": 10,  
+    "wind_speed": 10,
     "wind_direction": "NE",
     "drought": f"{drought} Drought"
 }
 
 with open(os.path.join(public_path, "weather_vars.json"), "w") as f_out:
-    json.dump(data, f_out, indent=4) 
+    json.dump(data, f_out, indent=4)
 
 
 rf_tpl   = os.path.join(data_path, "rainfall_daily_t-{i}.tif")
-temp_tpl = os.path.join(data_path, "tmean_daily_t-{i}.tif")  
+temp_tpl = os.path.join(data_path, "tmean_daily_t-{i}.tif")
 
 
 def zonal_stat(array, affine, nodata, geodf, stat):
