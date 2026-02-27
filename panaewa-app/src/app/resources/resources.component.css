@@ -218,3 +218,29 @@
   outline-offset: 3px;
   border-radius: 10px;
 }
+
+/* Pests & diseases table helpers */
+.crop-table--pests td {
+  vertical-align: top;
+}
+
+.sci em {
+  font-style: italic;
+}
+
+.cell-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.cell-list li {
+  margin: 0 0 6px;
+  line-height: 1.45;
+}
+
+/* Make long cells readable on smaller screens */
+@media (max-width: 860px) {
+  .crop-table--pests {
+    min-width: 920px; /* forces horizontal scroll inside .table-wrap */
+  }
+}
