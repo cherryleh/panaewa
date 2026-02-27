@@ -13,5 +13,6 @@
     "rf_pdiff": 50.0,
     "wind_speed": 10,
     "wind_direction": "NE",
-    "drought": "Abnormally Dry Drought"
+    "drought": "Abnormally Dry",
+    "air_quality": "Good"
 }
