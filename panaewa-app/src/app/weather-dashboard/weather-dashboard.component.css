@@ -301,6 +301,17 @@
   overflow: visible; /* overrides .card overflow hidden */
 }
 
+.card.vog-card .value {
+  font-size: clamp(1.1rem, 2vw, 2.2rem); /* min, fluid, max */
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+
+  /* allow wrapping for long labels */
+  white-space: normal;     /* override your nowrap */
+  overflow-wrap: anywhere; /* break long phrases nicely */
+}
+
 .card.vog-card .card-header {
   display: flex;
   align-items: center;
