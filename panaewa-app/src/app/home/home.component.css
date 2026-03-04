@@ -54,10 +54,11 @@
 
 .pdf-frame-wrapper iframe {
   width: min(95vw, 900px);
-  height: 60vh;
+  height: 80vh;
   border: none;
   background: #fff;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  margin-bottom: 100px;
 }
 
 
