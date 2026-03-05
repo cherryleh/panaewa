@@ -8,5 +8,4 @@ import { Component } from '@angular/core';
   styleUrl: './resources.component.css'
 })
 export class ResourcesComponent {
-//testing
 }
