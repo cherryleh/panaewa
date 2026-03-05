@@ -5,8 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'panaewa-app/public/weather_vars.json'
-      - 'panaewa-app/public/rf_temp_timeseries.json'
+      - 'panaewa-app/**'
 
 jobs:
   build-deploy:
