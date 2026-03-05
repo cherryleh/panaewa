@@ -5,7 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'panaewa-app/**'
+      - 'panaewa-app/**' 
+  workflow_run:
+    workflows: ["Run Data Processing"] 
+    types:
+      - completed
+
+permissions:
+  contents: write
 
 jobs:
   build-deploy:
