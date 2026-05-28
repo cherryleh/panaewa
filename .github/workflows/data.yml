@@ -1,53 +1,53 @@
-# name: Run Data Processing
+name: Run Data Processing
 
-# on:
-#   schedule:
-#     - cron: '0 15 * * *' 
-#   workflow_dispatch:
+on:
+  schedule:
+    - cron: '0 15 * * *' 
+  workflow_dispatch:
 
-# jobs:
-#   run-script:
-#     runs-on: ubuntu-latest
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
 
-#     steps:
-#       - name: Checkout repository
-#         uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-#       - name: Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
 
-#       - name: Install dependencies
-#         run: pip install -r panaewa-app/scripts/requirements.txt
+      - name: Install dependencies
+        run: pip install -r panaewa-app/scripts/requirements.txt
 
-#       - name: Decode and Mask API Token
-#         run: |
-#           # decode your GitHub Secret API_CONFIG_JSON
-#           API_SECRET=$(echo "${{ secrets.API_CONFIG_JSON }}" | base64 -d | tr -d '\n')
-#           AIR_SECRET=$(echo "${{ secrets.AIRNOW }}" | base64 -d | tr -d '\n')
-#           echo "::add-mask::$API_SECRET"
-#           echo "HCDP_API_KEY=$API_SECRET" >> $GITHUB_ENV
-#           echo "::add-mask::$AIR_SECRET"
-#           echo "AIRNOW_KEY=$AIR_SECRET" >> $GITHUB_ENV
+      - name: Decode and Mask API Token
+        run: |
+          # decode your GitHub Secret API_CONFIG_JSON
+          API_SECRET=$(echo "${{ secrets.API_CONFIG_JSON }}" | base64 -d | tr -d '\n')
+          AIR_SECRET=$(echo "${{ secrets.AIRNOW }}" | base64 -d | tr -d '\n')
+          echo "::add-mask::$API_SECRET"
+          echo "HCDP_API_KEY=$API_SECRET" >> $GITHUB_ENV
+          echo "::add-mask::$AIR_SECRET"
+          echo "AIRNOW_KEY=$AIR_SECRET" >> $GITHUB_ENV
 
-#       - name: Run Python script with API Token
-#         working-directory: panaewa-app/scripts
-#         env:
-#           API_TOKEN: ${{ env.HCDP_API_KEY }}
-#           AIRNOW_KEY: ${{ env.AIRNOW_KEY }}
-#         run: python data.py
+      - name: Run Python script with API Token
+        working-directory: panaewa-app/scripts
+        env:
+          API_TOKEN: ${{ env.HCDP_API_KEY }}
+          AIRNOW_KEY: ${{ env.AIRNOW_KEY }}
+        run: python data.py
 
-#       - name: List json files
-#         run: |
-#           ls -l panaewa-app/public/*.json
-#           cat panaewa-app/public/weather_vars.json
+      - name: List json files
+        run: |
+          ls -l panaewa-app/public/*.json
+          cat panaewa-app/public/weather_vars.json
 
-#       - name: Commit and push updated data
-#         run: |
-#           git config user.name "github-actions"
-#           git config user.email "github-actions@github.com"
-#           git add ./panaewa-app/public/*.json
-#           git commit -m "Update weather data"
-#           git push
+      - name: Commit and push updated data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add ./panaewa-app/public/*.json
+          git commit -m "Update weather data"
+          git push
