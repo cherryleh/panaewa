@@ -13,8 +13,9 @@ const PHASES = [
   { name: 'Kū Kolu',        phase: 'Waxing', illumination: '21–30%', actions: ["Three firm, upright shoots will be produced"] },
   { name: 'Kū Pau',         phase: 'Waxing', illumination: '30–40%', actions: ["Plant ʻuala and kalo for firm, upright growth"] },
   { name: "'Ole Kū Kahi",   phase: 'Waxing', illumination: '40–49%', actions: ["Unproductive planting day", "Cultivate, prune"] },
-  { name: "'Ole Kū Lua",    phase: 'Waxing', illumination: '49–58%', actions: ["Unproductive planting day", "Prune and mulch"] },
-  { name: "'Ole Kū Kolu",   phase: 'Waxing', illumination: '58–69%', actions: ["Unproductive planting day", "Mulch, prune, weed"] },
+  { name: "'Ole Kū Lua",    phase: 'Waxing', illumination: '49–50%', actions: ["Unproductive planting day", "Prune and mulch"] },
+  { name: "'Ole",           phase: 'Waxing', illumination: '50%',    actions: ["Perfect half moon", "Unproductive planting day"] },
+  { name: "'Ole Kū Kolu",   phase: 'Waxing', illumination: '50–69%', actions: ["Unproductive planting day", "Mulch, prune, weed"] },
   { name: "'Ole Pau",       phase: 'Waxing', illumination: '69–79%', actions: ["Hoʻonui ends", "Unproductive planting day except for certain vegetables", "Cultivate and prune"] },
   { name: 'Hūnā',           phase: 'Waxing', illumination: '79–87%', actions: ["Poepoe begins", "Plant gourds, ʻuala"] },
   { name: 'Mōhalu',         phase: 'Waxing', illumination: '87–93%', actions: ["Plant anything, especially flowers", "Do not plant trees"] },
@@ -27,8 +28,9 @@ const PHASES = [
   { name: "Lāʻau Kū Lua",   phase: 'Waning', illumination: '79–87%', actions: ["Gather medicinal plants", "Cultivate, don't plant"] },
   { name: "Lāʻau Pau",      phase: 'Waning', illumination: '69–79%', actions: ["Poepoe ends", "Prepare and administer herbal medicine", "Do not plant vines"] },
   { name: "'Ole Kū Kahi",   phase: 'Waning', illumination: '58–69%', actions: ["Emi begins", "Unproductive planting day", "Cultivate, irrigate, prune"] },
-  { name: "'Ole Kū Lua",    phase: 'Waning', illumination: '49–58%', actions: ["Unproductive planting day"] },
-  { name: "'Ole Pau",       phase: 'Waning', illumination: '40–49%', actions: ["Unproductive planting day", "Plant maiʻa, cultivate others", "Box Jellyfish, Man-O-War"] },
+  { name: "'Ole Kū Lua",    phase: 'Waning', illumination: '50–58%', actions: ["Unproductive planting day"] },
+  { name: "'Ole",           phase: 'Waning', illumination: '50%',    actions: ["Perfect half moon", "Unproductive planting day"] },
+  { name: "'Ole Pau",       phase: 'Waning', illumination: '40–50%', actions: ["Unproductive planting day", "Plant maiʻa, cultivate others", "Box Jellyfish, Man-O-War"] },
   { name: 'Kāloa Kū Kahi',  phase: 'Waning', illumination: '30–40%', actions: ["Plant long/tall things", "Box Jellyfish, Man-O-War"] },
   { name: 'Kāloa Kū Lua',   phase: 'Waning', illumination: '21–30%', actions: ["Do not plant maiʻa, ʻuala, melon", "Box Jellyfish, Man-O-War"] },
   { name: 'Kāloa Pau',      phase: 'Waning', illumination: '13–21%', actions: ["Plant ʻohe, kō"] },
@@ -76,9 +78,9 @@ export class MoonPhaseComponent implements OnInit {
     this.phaseLabel = this.isWaxing ? 'Waxing' : 'Waning';
     this.rotationDeg = (moonIllum.angle - moonPos.parallacticAngle) * (180 / Math.PI);
 
-    this.lunarDay = Math.round(phase * 30) || 30;
+    this.lunarDay = Math.round(phase * 32) || 32;
     const currentPhase = PHASES[this.lunarDay - 1];
-    const nextPhaseData = PHASES[this.lunarDay % 30];
+    const nextPhaseData = PHASES[this.lunarDay % 32];
     this.hawaiianPhase = currentPhase.name;
     this.actions = currentPhase.actions;
     this.nextPhase = nextPhaseData.name;
