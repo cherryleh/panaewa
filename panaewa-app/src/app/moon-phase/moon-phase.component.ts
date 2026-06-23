@@ -6,39 +6,56 @@ const MOON_COLOR = '#f5f3ce';
 const DARK_COLOR = '#1a1a2e';
 
 const PHASES = [
-  { name: 'Hilo',           phase: 'Waxing', illumination: '1–3%',   actions: ['Lunation begins', "Plant anything but maiʻa"] },
-  { name: 'Hoaka',          phase: 'Waxing', illumination: '3–7%',   actions: ["Plant ʻuala, tubers"] },
-  { name: 'Kū Kahi',        phase: 'Waxing', illumination: '7–13%',  actions: ["Plant ʻuala, upright (Kū) plants", "One firm, upright shoot will be produced"] },
-  { name: 'Kū Lua',         phase: 'Waxing', illumination: '13–21%', actions: ["Plant ʻuala, kalo, maiʻa, trees", "Two firm, upright shoots will be produced"] },
-  { name: 'Kū Kolu',        phase: 'Waxing', illumination: '21–30%', actions: ["Three firm, upright shoots will be produced"] },
-  { name: 'Kū Pau',         phase: 'Waxing', illumination: '30–40%', actions: ["Plant ʻuala and kalo for firm, upright growth"] },
-  { name: "'Ole Kū Kahi",   phase: 'Waxing', illumination: '40–49%', actions: ["Unproductive planting day", "Cultivate, prune"] },
-  { name: "'Ole Kū Lua",    phase: 'Waxing', illumination: '49–50%', actions: ["Unproductive planting day", "Prune and mulch"] },
-  { name: "'Ole",           phase: 'Waxing', illumination: '50%',    actions: ["Perfect half moon", "Unproductive planting day"] },
-  { name: "'Ole Kū Kolu",   phase: 'Waxing', illumination: '50–69%', actions: ["Unproductive planting day", "Mulch, prune, weed"] },
-  { name: "'Ole Pau",       phase: 'Waxing', illumination: '69–79%', actions: ["Hoʻonui ends", "Unproductive planting day except for certain vegetables", "Cultivate and prune"] },
-  { name: 'Hūnā',           phase: 'Waxing', illumination: '79–87%', actions: ["Poepoe begins", "Plant gourds, ʻuala"] },
-  { name: 'Mōhalu',         phase: 'Waxing', illumination: '87–93%', actions: ["Plant anything, especially flowers", "Do not plant trees"] },
-  { name: 'Hua',            phase: 'Waxing', illumination: '93–96%', actions: ["Plant anything that bears fruit (hua)"] },
-  { name: 'Akua',           phase: 'Waxing', illumination: '96–98%', actions: ["Plant ʻuala, kalo, gourds, maiʻa"] },
-  { name: 'Hoku',           phase: 'Full',   illumination: '99–100%',actions: ["Plant anything", "Kalo and maiʻa planted will produce many small fruits/corms"] },
-  { name: 'Māhealani',      phase: 'Waning', illumination: '96–98%', actions: ["Plant anything"] },
-  { name: 'Kulu',           phase: 'Waning', illumination: '93–96%', actions: ["Plant maiʻa, melons, ʻuala"] },
-  { name: "Lāʻau Kū Kahi",  phase: 'Waning', illumination: '87–93%', actions: ["Gather medicinal plants", "Plant maiʻa", "Do not plant ʻuala"] },
-  { name: "Lāʻau Kū Lua",   phase: 'Waning', illumination: '79–87%', actions: ["Gather medicinal plants", "Cultivate, don't plant"] },
-  { name: "Lāʻau Pau",      phase: 'Waning', illumination: '69–79%', actions: ["Poepoe ends", "Prepare and administer herbal medicine", "Do not plant vines"] },
-  { name: "'Ole Kū Kahi",   phase: 'Waning', illumination: '58–69%', actions: ["Emi begins", "Unproductive planting day", "Cultivate, irrigate, prune"] },
-  { name: "'Ole Kū Lua",    phase: 'Waning', illumination: '50–58%', actions: ["Unproductive planting day"] },
-  { name: "'Ole",           phase: 'Waning', illumination: '50%',    actions: ["Perfect half moon", "Unproductive planting day"] },
-  { name: "'Ole Pau",       phase: 'Waning', illumination: '40–50%', actions: ["Unproductive planting day", "Plant maiʻa, cultivate others", "Box Jellyfish, Man-O-War"] },
-  { name: 'Kāloa Kū Kahi',  phase: 'Waning', illumination: '30–40%', actions: ["Plant long/tall things", "Box Jellyfish, Man-O-War"] },
-  { name: 'Kāloa Kū Lua',   phase: 'Waning', illumination: '21–30%', actions: ["Do not plant maiʻa, ʻuala, melon", "Box Jellyfish, Man-O-War"] },
-  { name: 'Kāloa Pau',      phase: 'Waning', illumination: '13–21%', actions: ["Plant ʻohe, kō"] },
-  { name: 'Kāne',           phase: 'Waning', illumination: '7–13%',  actions: ["Plant anything, especially Kinolau of Kāne", "Night marchers"] },
-  { name: 'Lono',           phase: 'Waning', illumination: '3–7%',   actions: ["Plant anything, especially food plants"] },
-  { name: 'Mauli',          phase: 'Waning', illumination: '1–3%',   actions: ["Plant anything"] },
-  { name: 'Muku',           phase: 'New',    illumination: '0–1%',   actions: ["Lunation ends", "Maiʻa planted will bear muku-length bunches of fruit", "Do not plant kalo, ʻuala"] },
+  { name: 'Hilo',           phase: 'Waxing', waxing: true,  min: 1,  max: 3,   illumination: '1–3%',    actions: ['Lunation begins', "Plant anything but maiʻa"] },
+  { name: 'Hoaka',          phase: 'Waxing', waxing: true,  min: 3,  max: 7,   illumination: '3–7%',    actions: ["Plant ʻuala, tubers"] },
+  { name: 'Kū Kahi',        phase: 'Waxing', waxing: true,  min: 7,  max: 13,  illumination: '7–13%',   actions: ["Plant ʻuala, upright (Kū) plants", "One firm, upright shoot will be produced"] },
+  { name: 'Kū Lua',         phase: 'Waxing', waxing: true,  min: 13, max: 21,  illumination: '13–21%',  actions: ["Plant ʻuala, kalo, maiʻa, trees", "Two firm, upright shoots will be produced"] },
+  { name: 'Kū Kolu',        phase: 'Waxing', waxing: true,  min: 21, max: 30,  illumination: '21–30%',  actions: ["Three firm, upright shoots will be produced"] },
+  { name: 'Kū Pau',         phase: 'Waxing', waxing: true,  min: 30, max: 40,  illumination: '30–40%',  actions: ["Plant ʻuala and kalo for firm, upright growth"] },
+  { name: "'Ole Kū Kahi",   phase: 'Waxing', waxing: true,  min: 40, max: 49,  illumination: '40–49%',  actions: ["Unproductive planting day", "Cultivate, prune"] },
+  { name: "'Ole Kū Lua",    phase: 'Waxing', waxing: true,  min: 49, max: 50,  illumination: '49–50%',  actions: ["Unproductive planting day", "Prune and mulch"] },
+  { name: "'Ole",           phase: 'Waxing', waxing: true,  min: 50, max: 50,  illumination: '50%',     actions: ["Perfect half moon", "Unproductive planting day"] },
+  { name: "'Ole Kū Kolu",   phase: 'Waxing', waxing: true,  min: 50, max: 69,  illumination: '50–69%',  actions: ["Unproductive planting day", "Mulch, prune, weed"] },
+  { name: "'Ole Pau",       phase: 'Waxing', waxing: true,  min: 69, max: 79,  illumination: '69–79%',  actions: ["Hoʻonui ends", "Unproductive planting day except for certain vegetables", "Cultivate and prune"] },
+  { name: 'Hūnā',           phase: 'Waxing', waxing: true,  min: 79, max: 87,  illumination: '79–87%',  actions: ["Poepoe begins", "Plant gourds, ʻuala"] },
+  { name: 'Mōhalu',         phase: 'Waxing', waxing: true,  min: 87, max: 93,  illumination: '87–93%',  actions: ["Plant anything, especially flowers", "Do not plant trees"] },
+  { name: 'Hua',            phase: 'Waxing', waxing: true,  min: 93, max: 96,  illumination: '93–96%',  actions: ["Plant anything that bears fruit (hua)"] },
+  { name: 'Akua',           phase: 'Waxing', waxing: true,  min: 96, max: 98,  illumination: '96–98%',  actions: ["Plant ʻuala, kalo, gourds, maiʻa"] },
+  { name: 'Hoku',           phase: 'Full',   waxing: false, min: 99, max: 100, illumination: '99–100%', actions: ["Plant anything", "Kalo and maiʻa planted will produce many small fruits/corms"] },
+  { name: 'Māhealani',      phase: 'Waning', waxing: false, min: 96, max: 98,  illumination: '96–98%',  actions: ["Plant anything"] },
+  { name: 'Kulu',           phase: 'Waning', waxing: false, min: 93, max: 96,  illumination: '93–96%',  actions: ["Plant maiʻa, melons, ʻuala"] },
+  { name: "Lāʻau Kū Kahi",  phase: 'Waning', waxing: false, min: 87, max: 93,  illumination: '87–93%',  actions: ["Gather medicinal plants", "Plant maiʻa", "Do not plant ʻuala"] },
+  { name: "Lāʻau Kū Lua",   phase: 'Waning', waxing: false, min: 79, max: 87,  illumination: '79–87%',  actions: ["Gather medicinal plants", "Cultivate, don't plant"] },
+  { name: "Lāʻau Pau",      phase: 'Waning', waxing: false, min: 69, max: 79,  illumination: '69–79%',  actions: ["Poepoe ends", "Prepare and administer herbal medicine", "Do not plant vines"] },
+  { name: "'Ole Kū Kahi",   phase: 'Waning', waxing: false, min: 58, max: 69,  illumination: '58–69%',  actions: ["Emi begins", "Unproductive planting day", "Cultivate, irrigate, prune"] },
+  { name: "'Ole Kū Lua",    phase: 'Waning', waxing: false, min: 50, max: 58,  illumination: '50–58%',  actions: ["Unproductive planting day"] },
+  { name: "'Ole",           phase: 'Waning', waxing: false, min: 50, max: 50,  illumination: '50%',     actions: ["Perfect half moon", "Unproductive planting day"] },
+  { name: "'Ole Pau",       phase: 'Waning', waxing: false, min: 40, max: 50,  illumination: '40–50%',  actions: ["Unproductive planting day", "Plant maiʻa, cultivate others", "Box Jellyfish, Man-O-War"] },
+  { name: 'Kāloa Kū Kahi',  phase: 'Waning', waxing: false, min: 30, max: 40,  illumination: '30–40%',  actions: ["Plant long/tall things", "Box Jellyfish, Man-O-War"] },
+  { name: 'Kāloa Kū Lua',   phase: 'Waning', waxing: false, min: 21, max: 30,  illumination: '21–30%',  actions: ["Do not plant maiʻa, ʻuala, melon", "Box Jellyfish, Man-O-War"] },
+  { name: 'Kāloa Pau',      phase: 'Waning', waxing: false, min: 13, max: 21,  illumination: '13–21%',  actions: ["Plant ʻohe, kō"] },
+  { name: 'Kāne',           phase: 'Waning', waxing: false, min: 7,  max: 13,  illumination: '7–13%',   actions: ["Plant anything, especially Kinolau of Kāne", "Night marchers"] },
+  { name: 'Lono',           phase: 'Waning', waxing: false, min: 3,  max: 7,   illumination: '3–7%',    actions: ["Plant anything, especially food plants"] },
+  { name: 'Mauli',          phase: 'Waning', waxing: false, min: 1,  max: 3,   illumination: '1–3%',    actions: ["Plant anything"] },
+  { name: 'Muku',           phase: 'New',    waxing: false, min: 0,  max: 1,   illumination: '0–1%',    actions: ["Lunation ends", "Maiʻa planted will bear muku-length bunches of fruit", "Do not plant kalo, ʻuala"] },
 ];
+
+function findPhase(illumination: number, isWaxing: boolean) {
+  // Special case: exact 50% is the ʻOle half moon
+  if (illumination === 50) {
+    return PHASES.find(p => p.name === "'Ole" && p.waxing === isWaxing)!;
+  }
+  // Hoku (full) and Muku (new) are not waxing/waning specific
+  if (illumination >= 99) return PHASES.find(p => p.name === 'Hoku')!;
+  if (illumination <= 1)  return PHASES.find(p => p.name === 'Muku')!;
+
+  return PHASES.find(p =>
+    p.waxing === isWaxing &&
+    p.name !== "'Ole" &&
+    illumination >= p.min &&
+    illumination < p.max
+  ) ?? PHASES.find(p => p.name === 'Muku')!;
+}
 
 @Component({
   selector: 'app-moon-phase',
@@ -55,8 +72,8 @@ export class MoonPhaseComponent implements OnInit {
   actions: string[] = [];
   nextPhase: string = '';
   nextActions: string[] = [];
-  allPhases = PHASES;
   lunarDay: number = 1;
+  allPhases = PHASES;
 
   leftColor: string = DARK_COLOR;
   rightColor: string = DARK_COLOR;
@@ -78,13 +95,14 @@ export class MoonPhaseComponent implements OnInit {
     this.phaseLabel = this.isWaxing ? 'Waxing' : 'Waning';
     this.rotationDeg = (moonIllum.angle - moonPos.parallacticAngle) * (180 / Math.PI);
 
-    this.lunarDay = Math.round(phase * 32) || 32;
-    const currentPhase = PHASES[this.lunarDay - 1];
-    const nextPhaseData = PHASES[this.lunarDay % 32];
-    this.hawaiianPhase = currentPhase.name;
-    this.actions = currentPhase.actions;
-    this.nextPhase = nextPhaseData.name;
-    this.nextActions = nextPhaseData.actions;
+    const current = findPhase(this.illumination, this.isWaxing);
+    this.lunarDay = PHASES.indexOf(current) + 1;
+    this.hawaiianPhase = current.name;
+    this.actions = current.actions;
+
+    const nextIndex = (PHASES.indexOf(current) + 1) % PHASES.length;
+    this.nextPhase = PHASES[nextIndex].name;
+    this.nextActions = PHASES[nextIndex].actions;
 
     this.computeMoonVisual(phase);
   }
