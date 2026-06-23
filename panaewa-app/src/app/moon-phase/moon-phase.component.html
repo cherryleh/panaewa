@@ -1,0 +1,41 @@
+<div class="moon-phase">
+  <div class="moon" [style.transform]="'rotate(' + rotationDeg + 'deg)'">
+    <div class="moon-half left" [style.background]="leftColor"></div>
+    <div class="moon-half right" [style.background]="rightColor"></div>
+    <div class="moon-ellipse"
+         [style.background]="ellipseColor"
+         [style.transform]="'scaleX(' + ellipseScaleX + ')'">
+    </div>
+  </div>
+
+  <div class="phase-info">
+    <p class="phase-day">Day {{ lunarDay }}</p>
+    <h2 class="phase-name">{{ hawaiianPhase }}</h2>
+    <p class="phase-sub">{{ phaseLabel }} · {{ illumination }}% illuminated</p>
+
+    <ul class="actions">
+      <li *ngFor="let action of actions">{{ action }}</li>
+    </ul>
+
+    <div class="next-phase">
+      <p class="next-label">Next: {{ nextPhase }}</p>
+      <ul class="actions next-actions">
+        <li *ngFor="let action of nextActions">{{ action }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="all-phases">
+    <h3 class="all-phases-title">All Phases</h3>
+    <div class="phases-grid">
+      <div class="phase-card" *ngFor="let phase of allPhases; let i = index"
+           [class.current]="i + 1 === lunarDay">
+        <div class="card-name">{{ phase.name }}</div>
+        <div class="card-meta">{{ phase.phase }} · {{ phase.illumination }}</div>
+        <ul class="card-actions">
+          <li *ngFor="let action of phase.actions">{{ action }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
