@@ -10,7 +10,7 @@
   --accent: #3d7a4a;
 
   color: var(--text);
-  max-width: 900px;
+  max-width: min(92vw, 1100px);
   margin: 0 auto;
   padding: 18px 16px 40px;
 }

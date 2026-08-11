@@ -10,7 +10,7 @@
   --radius-sm: 12px;
 
   color: var(--text);
-  max-width: 1000px;
+  max-width: min(92vw, 1200px);
   margin: 0 auto;
   padding: 18px 16px;
 }
