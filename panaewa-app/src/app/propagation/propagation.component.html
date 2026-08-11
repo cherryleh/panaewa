@@ -1,0 +1,50 @@
+<section class="prop" aria-labelledby="propTitle">
+  <div class="prop-header">
+    <h2 id="propTitle" class="prop-title">Propagation Guides</h2>
+    <p class="prop-subtitle">Step-by-step propagation techniques from Keaʻahuli O Panaʻewa workshops.</p>
+  </div>
+
+  <div class="prop-tabs" role="tablist">
+    <button
+      *ngFor="let guide of guides"
+      type="button"
+      role="tab"
+      class="prop-tab"
+      [class.active]="guide.id === selected.id"
+      [style.--accent]="guide.accent"
+      [attr.aria-selected]="guide.id === selected.id"
+      (click)="select(guide)">
+      {{ guide.name }}
+    </button>
+  </div>
+
+  <article class="prop-guide" [style.--accent]="selected.accent">
+    <header class="guide-head">
+      <h3 class="guide-name">{{ selected.name }} Propagation Guide</h3>
+      <p class="guide-subtitle">{{ selected.subtitle }}</p>
+    </header>
+
+    <div class="panel">
+      <h4 class="panel-title">Materials</h4>
+      <ul class="materials-list">
+        <li *ngFor="let item of selected.materials">{{ item }}</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <div class="step" *ngFor="let step of selected.steps">
+        <div class="step-num">{{ step.number }}</div>
+        <div class="step-body">
+          <div class="step-images" [class.multi]="step.images.length > 1">
+            <img
+              *ngFor="let img of step.images"
+              [src]="imgSrc(img)"
+              [alt]="selected.name + ' propagation step ' + step.number"
+              loading="lazy">
+          </div>
+          <p class="step-text">{{ step.text }}</p>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>

@@ -14,7 +14,6 @@ const PHASES = [
   { name: 'Kū Pau',         phase: 'Waxing', waxing: true,  min: 30, max: 40,  illumination: '30–40%',  actions: ["Plant ʻuala and kalo for firm, upright growth"] },
   { name: "'Ole Kū Kahi",   phase: 'Waxing', waxing: true,  min: 40, max: 49,  illumination: '40–49%',  actions: ["Unproductive planting day", "Cultivate, prune"] },
   { name: "'Ole Kū Lua",    phase: 'Waxing', waxing: true,  min: 49, max: 50,  illumination: '49–50%',  actions: ["Unproductive planting day", "Prune and mulch"] },
-  { name: "'Ole",           phase: 'Waxing', waxing: true,  min: 50, max: 50,  illumination: '50%',     actions: ["Perfect half moon", "Unproductive planting day"] },
   { name: "'Ole Kū Kolu",   phase: 'Waxing', waxing: true,  min: 50, max: 69,  illumination: '50–69%',  actions: ["Unproductive planting day", "Mulch, prune, weed"] },
   { name: "'Ole Pau",       phase: 'Waxing', waxing: true,  min: 69, max: 79,  illumination: '69–79%',  actions: ["Hoʻonui ends", "Unproductive planting day except for certain vegetables", "Cultivate and prune"] },
   { name: 'Hūnā',           phase: 'Waxing', waxing: true,  min: 79, max: 87,  illumination: '79–87%',  actions: ["Poepoe begins", "Plant gourds, ʻuala"] },
@@ -29,7 +28,6 @@ const PHASES = [
   { name: "Lāʻau Pau",      phase: 'Waning', waxing: false, min: 69, max: 79,  illumination: '69–79%',  actions: ["Poepoe ends", "Prepare and administer herbal medicine", "Do not plant vines"] },
   { name: "'Ole Kū Kahi",   phase: 'Waning', waxing: false, min: 58, max: 69,  illumination: '58–69%',  actions: ["Emi begins", "Unproductive planting day", "Cultivate, irrigate, prune"] },
   { name: "'Ole Kū Lua",    phase: 'Waning', waxing: false, min: 50, max: 58,  illumination: '50–58%',  actions: ["Unproductive planting day"] },
-  { name: "'Ole",           phase: 'Waning', waxing: false, min: 50, max: 50,  illumination: '50%',     actions: ["Perfect half moon", "Unproductive planting day"] },
   { name: "'Ole Pau",       phase: 'Waning', waxing: false, min: 40, max: 50,  illumination: '40–50%',  actions: ["Unproductive planting day", "Plant maiʻa, cultivate others", "Box Jellyfish, Man-O-War"] },
   { name: 'Kāloa Kū Kahi',  phase: 'Waning', waxing: false, min: 30, max: 40,  illumination: '30–40%',  actions: ["Plant long/tall things", "Box Jellyfish, Man-O-War"] },
   { name: 'Kāloa Kū Lua',   phase: 'Waning', waxing: false, min: 21, max: 30,  illumination: '21–30%',  actions: ["Do not plant maiʻa, ʻuala, melon", "Box Jellyfish, Man-O-War"] },
@@ -41,17 +39,12 @@ const PHASES = [
 ];
 
 function findPhase(illumination: number, isWaxing: boolean) {
-  // Special case: exact 50% is the ʻOle half moon
-  if (illumination === 50) {
-    return PHASES.find(p => p.name === "'Ole" && p.waxing === isWaxing)!;
-  }
   // Hoku (full) and Muku (new) are not waxing/waning specific
   if (illumination >= 99) return PHASES.find(p => p.name === 'Hoku')!;
   if (illumination <= 1)  return PHASES.find(p => p.name === 'Muku')!;
 
   return PHASES.find(p =>
     p.waxing === isWaxing &&
-    p.name !== "'Ole" &&
     illumination >= p.min &&
     illumination < p.max
   ) ?? PHASES.find(p => p.name === 'Muku')!;
@@ -79,21 +72,15 @@ export class MoonPhaseComponent implements OnInit {
   rightColor: string = DARK_COLOR;
   ellipseColor: string = DARK_COLOR;
   ellipseScaleX: number = 1;
-  rotationDeg: number = 0;
-
-  private readonly LAT = 19.7297;
-  private readonly LNG = -155.0900;
 
   ngOnInit(): void {
     const now = new Date();
     const moonIllum = SunCalc.getMoonIllumination(now);
-    const moonPos = SunCalc.getMoonPosition(now, this.LAT, this.LNG);
     const phase = moonIllum.phase;
 
     this.illumination = Math.round(moonIllum.fraction * 100);
     this.isWaxing = phase < 0.5;
     this.phaseLabel = this.isWaxing ? 'Waxing' : 'Waning';
-    this.rotationDeg = (moonIllum.angle - moonPos.parallacticAngle) * (180 / Math.PI);
 
     const current = findPhase(this.illumination, this.isWaxing);
     this.lunarDay = PHASES.indexOf(current) + 1;

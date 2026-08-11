@@ -1,0 +1,86 @@
+<section class="pp" aria-labelledby="ppTitle">
+  <div class="pp-header">
+    <h2 id="ppTitle" class="pp-title">Plant Profiles</h2>
+    <p class="pp-subtitle">Canoe plants of Panaʻewa — one profile per plant.</p>
+  </div>
+
+  <div class="pp-tabs" role="tablist">
+    <button
+      *ngFor="let plant of plants"
+      type="button"
+      role="tab"
+      class="pp-tab"
+      [class.active]="plant.id === selected.id"
+      [style.--accent]="plant.accent"
+      [attr.aria-selected]="plant.id === selected.id"
+      (click)="select(plant)">
+      {{ plant.name }}
+    </button>
+  </div>
+
+  <article class="pp-profile" [style.--accent]="selected.accent">
+    <header class="profile-head">
+      <h3 class="profile-name">{{ selected.name }}</h3>
+      <p class="profile-scientific"><em>{{ selected.scientific }}</em></p>
+      <div class="profile-meta">
+        <span class="meta-item"><span class="meta-label">Other names</span>{{ selected.otherNames }}</span>
+        <span class="meta-item"><span class="meta-label">Kinolau</span>{{ selected.kinolau }}</span>
+      </div>
+      <p class="profile-uses">{{ selected.uses }}</p>
+    </header>
+
+    <div class="panel">
+      <h4 class="panel-title">Profile</h4>
+      <p class="panel-text" [innerHTML]="format(selected.profile)"></p>
+    </div>
+
+    <div class="panel" *ngIf="selected.vocab.length">
+      <h4 class="panel-title">Vocabulary</h4>
+      <ul class="vocab-list">
+        <li *ngFor="let term of selected.vocab" [innerHTML]="format(term)"></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h4 class="panel-title">Planting</h4>
+      <p class="panel-text" [innerHTML]="format(selected.planting)"></p>
+    </div>
+
+    <div class="panel" *ngIf="selected.other.length">
+      <h4 class="panel-title">Other Notes</h4>
+      <ng-container *ngFor="let para of selected.other">
+        <p class="panel-text list-text" *ngIf="isListItem(para)" [innerHTML]="format(para)"></p>
+        <p class="panel-text" *ngIf="!isListItem(para)" [innerHTML]="format(para)"></p>
+      </ng-container>
+    </div>
+
+    <div class="panel" *ngIf="selected.mythologyRefs.length">
+      <h4 class="panel-title">Mythology</h4>
+      <ul class="myth-list">
+        <li *ngFor="let ref of selected.mythologyRefs" [innerHTML]="format(ref)"></li>
+      </ul>
+    </div>
+
+    <details class="panel acc-panel" *ngIf="selected.textExcerpts.length">
+      <summary class="panel-title acc-summary">Text Excerpts <span class="count">({{ selected.textExcerpts.length }})</span></summary>
+      <p class="panel-text excerpt" *ngFor="let quote of selected.textExcerpts" [innerHTML]="format(quote)"></p>
+    </details>
+
+    <details class="panel acc-panel" *ngIf="selected.interviewLines.length">
+      <summary class="panel-title acc-summary">Interview Quotes</summary>
+      <p class="panel-text interview-intro" [innerHTML]="format(selected.interviewTitle)"></p>
+      <p class="panel-text interview-line" *ngFor="let line of selected.interviewLines" [innerHTML]="format(line)"></p>
+    </details>
+
+    <details class="panel acc-panel" *ngIf="selected.oleloNoeau.length">
+      <summary class="panel-title acc-summary">ʻŌlelo Noʻeau <span class="count">({{ selected.oleloNoeau.length }})</span></summary>
+      <p class="olelo-source">From Pukui, <em>ʻŌlelo Noʻeau</em> (1983)</p>
+      <ul class="olelo-list">
+        <li *ngFor="let saying of selected.oleloNoeau">
+          <span class="olelo-num" *ngIf="saying.num">#{{ saying.num }}</span>
+          <span [innerHTML]="format(saying.text)"></span>
+        </li>
+      </ul>
+    </details>
+  </article>
+</section>
