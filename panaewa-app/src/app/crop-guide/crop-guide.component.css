@@ -1,0 +1,260 @@
+/* Section wrapper (light theme to match body background) */
+.ulu {
+  --card-bg: #ffffff;
+  --card-border: #e6e9f2;
+  --text: #1f2a37;
+  --muted: #5b6676;
+  --link: #1f6feb;
+  --shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+  --radius: 16px;
+  --radius-sm: 12px;
+
+  color: var(--text);
+  max-width: min(92vw, 1200px);
+  margin: 0 auto;
+  padding: 18px 16px;
+}
+
+/* Header */
+.ulu-header { margin-bottom: 14px; }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.ulu-title {
+  margin: 0 0 6px;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.ulu-source {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.ulu-source a {
+  color: var(--link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.ulu-source a:hover {
+  text-decoration: underline;
+}
+
+/* Card / panel */
+.panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel--spaced { margin-top: 14px; }
+
+.panel-head {
+  padding: 16px 16px 8px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
+.panel-subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Accordion */
+.acc { padding: 8px 12px 14px; }
+
+.acc-item {
+  margin: 10px 4px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: #fbfcff;
+  overflow: hidden;
+}
+
+.acc-head {
+  cursor: pointer;
+  padding: 12px 12px;
+  display: grid;
+  grid-template-columns: 1fr auto 18px;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+}
+
+.acc-head::-webkit-details-marker { display: none; }
+
+.acc-name {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.acc-tag {
+  font-size: 12px;
+  color: var(--muted);
+  background: #f1f4fb;
+  border: 1px solid #e3e9f8;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.acc-icon {
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #7a8698;
+  border-bottom: 2px solid #7a8698;
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+  justify-self: end;
+}
+
+.acc-item[open] .acc-icon {
+  transform: rotate(-135deg);
+}
+
+.acc-body {
+  padding: 0 12px 12px;
+  color: #2b3645;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* Table */
+.table-wrap {
+  padding: 8px 12px 14px;
+  overflow: auto;
+}
+
+.crop-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 680px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.crop-table thead th {
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+  background: #f7f9ff;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--card-border);
+  position: sticky;
+  top: 0;
+}
+
+.crop-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid #eef1f7;
+  font-size: 14px;
+  color: #243041;
+}
+
+.crop-table tbody tr:hover td {
+  background: #fafcff;
+}
+
+.crop-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.crop-name {
+  font-weight: 700;
+}
+
+/* Pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.pill-low {
+  color: #8a4b00;
+  background: #fff2e0;
+  border-color: #ffd7a8;
+}
+
+.pill-vlow {
+  color: #8b1f2b;
+  background: #ffe7ea;
+  border-color: #ffbcc5;
+}
+
+.pill-high {
+  color: #11643a;
+  background: #e6f7ee;
+  border-color: #b9ebd1;
+}
+
+/* Note */
+.note {
+  margin: 10px 16px 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Nice keyboard focus for accessibility */
+.acc-head:focus-visible,
+.table-wrap:focus-visible,
+.ulu-source a:focus-visible {
+  outline: 3px solid rgba(31, 111, 235, 0.25);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+/* Pests & diseases table helpers */
+.crop-table--pests td {
+  vertical-align: top;
+}
+
+.sci em {
+  font-style: italic;
+}
+
+.cell-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.cell-list li {
+  margin: 0 0 6px;
+  line-height: 1.45;
+}
+
+/* Make long cells readable on smaller screens */
+@media (max-width: 860px) {
+  .crop-table--pests {
+    min-width: 920px; /* forces horizontal scroll inside .table-wrap */
+  }
+}

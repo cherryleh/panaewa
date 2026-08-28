@@ -17,6 +17,20 @@
 
 .pp-header { margin-bottom: 16px; }
 
+.back-link {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 .pp-title {
   margin: 0 0 6px;
   font-size: 28px;

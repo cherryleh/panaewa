@@ -1,7 +1,7 @@
 <section class="pp" aria-labelledby="ppTitle">
   <div class="pp-header">
+    <a class="back-link" routerLink="/resources">&larr; Resources</a>
     <h2 id="ppTitle" class="pp-title">Plant Profiles</h2>
-    <p class="pp-subtitle">Canoe plants of Panaʻewa — one profile per plant.</p>
   </div>
 
   <div class="pp-tabs" role="tablist">
@@ -54,12 +54,12 @@
       </ng-container>
     </div>
 
-    <div class="panel" *ngIf="selected.mythologyRefs.length">
-      <h4 class="panel-title">Mythology</h4>
+    <details class="panel acc-panel" *ngIf="selected.mythologyRefs.length">
+      <summary class="panel-title acc-summary">Mythology <span class="count">({{ selected.mythologyRefs.length }})</span></summary>
       <ul class="myth-list">
         <li *ngFor="let ref of selected.mythologyRefs" [innerHTML]="format(ref)"></li>
       </ul>
-    </div>
+    </details>
 
     <details class="panel acc-panel" *ngIf="selected.textExcerpts.length">
       <summary class="panel-title acc-summary">Text Excerpts <span class="count">({{ selected.textExcerpts.length }})</span></summary>

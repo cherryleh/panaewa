@@ -1,5 +1,6 @@
 <section class="prop" aria-labelledby="propTitle">
   <div class="prop-header">
+    <a class="back-link" routerLink="/resources">&larr; Resources</a>
     <h2 id="propTitle" class="prop-title">Propagation Guides</h2>
     <p class="prop-subtitle">Step-by-step propagation techniques from Keaʻahuli O Panaʻewa workshops.</p>
   </div>
@@ -40,11 +41,28 @@
               *ngFor="let img of step.images"
               [src]="imgSrc(img)"
               [alt]="selected.name + ' propagation step ' + step.number"
-              loading="lazy">
+              loading="lazy"
+              tabindex="0"
+              (click)="openLightbox(imgSrc(img), selected.name + ' propagation step ' + step.number)"
+              (keydown.enter)="openLightbox(imgSrc(img), selected.name + ' propagation step ' + step.number)">
           </div>
-          <p class="step-text">{{ step.text }}</p>
+          <div class="step-text">
+            <p *ngFor="let line of step.text">{{ line }}</p>
+          </div>
         </div>
       </div>
     </div>
   </article>
+
+  <div
+    class="lightbox"
+    *ngIf="lightboxSrc"
+    (click)="closeLightbox()">
+    <button
+      type="button"
+      class="lightbox-close"
+      aria-label="Close enlarged photo"
+      (click)="closeLightbox()">&times;</button>
+    <img [src]="lightboxSrc" [alt]="lightboxAlt" (click)="$event.stopPropagation()">
+  </div>
 </section>

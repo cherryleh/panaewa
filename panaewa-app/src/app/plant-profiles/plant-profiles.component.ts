@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PLANT_PROFILES, PlantProfile } from './plant-profiles.data';
 
 @Component({
   selector: 'app-plant-profiles',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './plant-profiles.component.html',
   styleUrl: './plant-profiles.component.css'
 })

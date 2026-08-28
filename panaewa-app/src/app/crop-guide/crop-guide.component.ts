@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-resources',
+  selector: 'app-crop-guide',
   standalone: true,
   imports: [RouterLink],
-  templateUrl: './resources.component.html',
-  styleUrl: './resources.component.css'
+  templateUrl: './crop-guide.component.html',
+  styleUrl: './crop-guide.component.css'
 })
-export class ResourcesComponent {
+export class CropGuideComponent {
 }
