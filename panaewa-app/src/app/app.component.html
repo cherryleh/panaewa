@@ -1,6 +1,7 @@
-<main class="main">
-  <div class="content">
-    <app-header></app-header>
+<div class="app-shell">
+  <app-header></app-header>
+  <div class="page-content">
+    <router-outlet />
   </div>
-</main>
-<router-outlet />
+  <app-footer></app-footer>
+</div>

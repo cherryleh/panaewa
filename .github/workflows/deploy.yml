@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'panaewa-app/**' 
+      - 'panaewa-app/**'
   workflow_run:
-    workflows: ["Run Data Processing"] 
+    workflows: ["Run Data Processing"]
     types:
       - completed
 
@@ -31,6 +31,15 @@ jobs:
         run: |
           cd panaewa-app
           npm install
+
+      - name: Inject API token into environment.prod.ts
+        run: |
+          mkdir -p panaewa-app/src/environments
+          echo "export const environment = { production: true, apiToken: '$(echo '${{ secrets.API_CONFIG_JSON }}' | base64 -d)' };" > panaewa-app/src/environments/environment.prod.ts
+
+      - name: Generate environment.ts
+        run: |
+          echo "export const environment = { production: false, apiToken: '' };" > panaewa-app/src/environments/environment.ts
 
       - name: Build Angular app
         run: |

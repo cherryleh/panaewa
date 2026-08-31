@@ -192,8 +192,6 @@ data = {
     "rf_daily": round(rf_daily/25.4,0),
     "rf_monthly": round(rf_monthly/25.4,0),
     "rf_pdiff": round(rf_pdiff*100,0),
-    "wind_speed": 10,
-    "wind_direction": "NE",
     "drought": f"{drought}",
     "air_quality": f"{air_quality}"
 }

@@ -3,6 +3,7 @@ import * as Highcharts from 'highcharts';
 import { CommonModule } from '@angular/common';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { HttpClient } from '@angular/common/http';
+import { WindService } from '../services/wind.service';
 
 type RFTempPoint = { date: string; rf_sum: number; temp_mean: number; };
 type WeatherVars = {
@@ -18,8 +19,6 @@ type WeatherVars = {
   rf_daily: number;
   rf_monthly: number;
   rf_pdiff: number;
-  wind_speed: number;
-  wind_direction: string;
   drought: string;
   air_quality: string
 };
@@ -32,11 +31,12 @@ type WeatherVars = {
   styleUrls: ['./weather-dashboard.component.css']
 })
   export class WeatherDashboardComponent implements OnInit {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private windService: WindService) {}
   yesterdayData = { humidity: 0, tmean: 0, rainfall: 0, airQuality: '' };
   yesterday = '';
   lastMonth = '';
-  lastHourWind = { speed: 10, direction: '' }; // Placeholder (no data in JSON)
+  lastHourWind = { speed: 0, direction: '' };
+  windTimestamp = '';
   lastMonthSummary = { tmean: 0, rainfall: 0, drought: '' }; // Drought placeholder
   vogLevel = 'Good'; // Placeholder until JSON has value
   dailyRainfallChange = '';
@@ -169,6 +169,23 @@ Highcharts: typeof Highcharts = Highcharts;
       error: (err) => console.error('Failed to load weather_vars.json', err)
     });
 
-
+    // 3. Load the latest wind reading directly from the HCDP mesonet API
+    this.windService.getLatestWind().subscribe({
+      next: (wind) => {
+        this.lastHourWind = {
+          speed: wind.speed,
+          direction: wind.direction
+        };
+        this.windTimestamp = wind.timestamp
+          ? new Date(wind.timestamp).toLocaleString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit'
+            })
+          : '';
+      },
+      error: (err) => console.error('Failed to load latest wind reading', err)
+    });
   }
 }
