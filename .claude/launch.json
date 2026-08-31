@@ -4,7 +4,7 @@
     {
       "name": "panaewa-app",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["start", "--prefix", "panaewa-app"],
+      "runtimeArgs": ["run", "start", "--prefix", "panaewa-app"],
       "port": 4200
     }
   ]

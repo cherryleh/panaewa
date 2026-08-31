@@ -37,6 +37,7 @@ type WeatherVars = {
   lastMonth = '';
   lastHourWind = { speed: 0, direction: '' };
   windTimestamp = '';
+  windLoading = true;
   lastMonthSummary = { tmean: 0, rainfall: 0, drought: '' }; // Drought placeholder
   vogLevel = 'Good'; // Placeholder until JSON has value
   dailyRainfallChange = '';
@@ -184,8 +185,12 @@ Highcharts: typeof Highcharts = Highcharts;
               minute: '2-digit'
             })
           : '';
+        this.windLoading = false;
       },
-      error: (err) => console.error('Failed to load latest wind reading', err)
+      error: (err) => {
+        console.error('Failed to load latest wind reading', err);
+        this.windLoading = false;
+      }
     });
   }
 }

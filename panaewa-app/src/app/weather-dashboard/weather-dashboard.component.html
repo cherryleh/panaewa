@@ -51,20 +51,53 @@
 
 
     <div class="card drought-card drought">
-        <h3>Drought Condition</h3>
+        <div class="card-header">
+          <h3>Drought Condition</h3>
+
+          <button type="button" class="info-btn" aria-label="Drought condition info">
+            i
+            <span class="tooltip" role="tooltip">
+              Drought condition is based on the 3-month Standardized Precipitation Index (SPI), which compares recent rainfall to the long-term average for the same period and location.
+            </span>
+          </button>
+        </div>
         <p class="value">{{ lastMonthSummary.drought }}</p>
         <p class="label">{{lastMonth}}</p>
     </div>
     <!-- Wind -->
     <div class="card wind-card wind">
-        <h3>Wind</h3>
-        <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }}<span class="unit"> mph</span></p>
-        <p class="label">As of {{ windTimestamp }}</p>
+        <div class="card-header">
+          <h3>Wind</h3>
+
+          <button type="button" class="info-btn" aria-label="Wind info">
+            i
+            <span class="tooltip" role="tooltip">
+              Wind speed and direction are the latest reading from the IPIF (Institute of Pacific Islands Forestry) Hawaiʻi Mesonet station, updated every 15 minutes.
+            </span>
+          </button>
+        </div>
+        <ng-container *ngIf="!windLoading; else windLoadingTpl">
+          <p class="value">{{ lastHourWind.direction }} {{ lastHourWind.speed }}<span class="unit"> mph</span></p>
+          <p class="label">As of {{ windTimestamp }}</p>
+        </ng-container>
+        <ng-template #windLoadingTpl>
+          <p class="value">Loading…</p>
+          <p class="label">&nbsp;</p>
+        </ng-template>
     </div>
     <div class="small-cards-row">
       <!-- Humidity -->
       <div class="card humidity-card humidity">
-        <h3>Humidity</h3>
+        <div class="card-header">
+          <h3>Humidity</h3>
+
+          <button type="button" class="info-btn" aria-label="Humidity info">
+            i
+            <span class="tooltip" role="tooltip">
+              Relative humidity is the average for {{ yesterday }} from 1:00PM to 1:59PM.
+            </span>
+          </button>
+        </div>
         <p class="value">{{ yesterdayData.humidity }}<span class="unit">%</span></p>
         <p class="label">{{ yesterday }}</p>
       </div>
