@@ -24,6 +24,7 @@ type WeatherVars = {
 };
 type RainfallHistoryPoint = { date: string; value: number | null };
 type MonthOption = { year: number; month: number; label: string };
+type MonthlyRainfallStats = { rainfall_in: number; normal_in: number; anomaly_in: number; anomaly_pct: number | null };
 
 @Component({
   selector: 'app-weather-dashboard',
@@ -53,6 +54,9 @@ type MonthOption = { year: number; month: number; label: string };
   monthIndex = 0;
   historyLoading = true;
   historyError = '';
+
+  monthlyStats = new Map<string, MonthlyRainfallStats>();
+  selectedMonthStats: MonthlyRainfallStats | null = null;
 
   rangeUpdateFlag = false;
   rangeChartOptions: Highcharts.Options = {
@@ -261,6 +265,30 @@ Highcharts: typeof Highcharts = Highcharts;
           this.historyLoading = false;
         }
       });
+
+    // 5. Load monthly totals + climatological anomaly (shown alongside the slider above)
+    this.http.get('https://raw.githubusercontent.com/cherryleh/panaewa/refs/heads/main/panaewa-app/public/rainfall_monthly_1990_present.csv', { responseType: 'text' })
+      .subscribe({
+        next: (csv) => {
+          const lines = csv.trim().split('\n');
+          lines.shift(); // drop header row
+
+          for (const line of lines) {
+            const [yearMonth, rainfall_in, normal_in, anomaly_in, anomaly_pct] = line.split(',');
+            this.monthlyStats.set(yearMonth, {
+              rainfall_in: Number(rainfall_in),
+              normal_in: Number(normal_in),
+              anomaly_in: Number(anomaly_in),
+              anomaly_pct: anomaly_pct === '' ? null : Number(anomaly_pct)
+            });
+          }
+
+          if (this.monthOptions.length > 0) {
+            this.plotMonth();
+          }
+        },
+        error: (err) => console.error('Failed to load monthly rainfall stats', err)
+      });
   }
 
   get selectedMonth(): MonthOption | null {
@@ -295,6 +323,8 @@ Highcharts: typeof Highcharts = Highcharts;
 
     const categories = points.map(p => p.date.split('-')[2]);
     const data = points.map(p => p.value);
+
+    this.selectedMonthStats = this.monthlyStats.get(prefix) ?? null;
 
     this.rangeChartOptions = {
       ...this.rangeChartOptions,

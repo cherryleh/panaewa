@@ -208,6 +208,37 @@
   font-size: 0.9rem;
 }
 
+.month-anomaly {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.month-anomaly .anomaly-total {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.month-anomaly .anomaly-vs {
+  color: #666;
+}
+
+.month-anomaly .anomaly-pct {
+  font-weight: 600;
+}
+
+.month-anomaly .anomaly-pct.positive {
+  color: green;
+}
+
+.month-anomaly .anomaly-pct.negative {
+  color: red;
+}
+
 
 .card .comparison {
   font-size: 1vw;

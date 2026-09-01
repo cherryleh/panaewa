@@ -147,6 +147,15 @@
 
             <button type="button" class="month-nav-btn" (click)="nextMonth()" [disabled]="monthIndex === monthOptions.length - 1" aria-label="Next month">&rsaquo;</button>
           </div>
+          <div class="month-anomaly" *ngIf="selectedMonthStats as stats">
+            <span class="anomaly-total">{{ stats.rainfall_in }} in</span>
+            <span class="anomaly-vs">vs. {{ stats.normal_in }} in normal</span>
+            <span class="anomaly-pct"
+                  [ngClass]="{'positive': (stats.anomaly_pct ?? 0) > 0, 'negative': (stats.anomaly_pct ?? 0) < 0}"
+                  *ngIf="stats.anomaly_pct !== null">
+              {{ stats.anomaly_pct > 0 ? '+' : '' }}{{ stats.anomaly_pct }}%
+            </span>
+          </div>
           <highcharts-chart [Highcharts]="Highcharts" [options]="rangeChartOptions" [(update)]="rangeUpdateFlag"
               style="width: 100%; height: 320px; display: block;">
           </highcharts-chart>
