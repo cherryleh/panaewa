@@ -189,7 +189,7 @@ data = {
     "tmean_daily": round((temp_daily* 9/5) + 32,0),
     "tmean_monthly": round((tmean_monthly* 9/5) + 32,0),
     "tmean_diff":round((tmean_month_diff* 9/5),2),
-    "rf_daily": round(rf_daily/25.4,0),
+    "rf_daily": round(rf_daily/25.4,2),
     "rf_monthly": round(rf_monthly/25.4,0),
     "rf_pdiff": round(rf_pdiff*100,0),
     "drought": f"{drought}",
