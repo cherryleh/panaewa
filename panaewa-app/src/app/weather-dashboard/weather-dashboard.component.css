@@ -1,13 +1,37 @@
+.dashboard-section {
+  max-width: 70vw;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+.section-title {
+  margin: 1.5rem 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dashboard-section:first-of-type .section-title {
+  margin-top: 0.5rem;
+}
+
+.section-desc {
+  margin: 0 auto 0.9rem;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+  max-width: 80ch;
+  text-align: center;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: auto;
   gap: 0.4rem;
-  padding: 0.5rem;
   box-sizing: border-box;
-  max-width: 70vw;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 
@@ -143,10 +167,6 @@
   grid-row: 3;
 }
 
-.range-card {
-  grid-row: 4;
-}
-
 .range-controls {
   display: flex;
   align-items: center;
@@ -260,11 +280,14 @@
 }
 
 @media (max-width: 900px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+  .dashboard-section {
     padding: 1rem;
     overflow-x: hidden;
     max-width: 90vw;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 
   .rainfall,

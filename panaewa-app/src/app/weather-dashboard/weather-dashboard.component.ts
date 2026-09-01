@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import * as Highcharts from 'highcharts';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { HttpClient } from '@angular/common/http';
 import { WindService } from '../services/wind.service';
@@ -25,6 +25,9 @@ type WeatherVars = {
 type RainfallHistoryPoint = { date: string; value: number | null };
 type MonthOption = { year: number; month: number; label: string };
 type MonthlyRainfallStats = { rainfall_in: number; normal_in: number; anomaly_in: number; anomaly_pct: number | null };
+const SPI3_LABELS = ['D4', 'D3', 'D2', 'D1', 'D0', 'Near Normal', 'W0', 'W1', 'W2', 'W3', 'W4'] as const;
+type Spi3Label = typeof SPI3_LABELS[number];
+type Spi3MonthPct = Record<Spi3Label, number | null>;
 
 @Component({
   selector: 'app-weather-dashboard',
@@ -34,7 +37,15 @@ type MonthlyRainfallStats = { rainfall_in: number; normal_in: number; anomaly_in
   styleUrls: ['./weather-dashboard.component.css']
 })
   export class WeatherDashboardComponent implements OnInit {
-  constructor(private http: HttpClient, private windService: WindService) {}
+  isBrowser: boolean;
+
+  constructor(
+    private http: HttpClient,
+    private windService: WindService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
   yesterdayData = { humidity: 0, tmean: 0, rainfall: 0, airQuality: '' };
   yesterday = '';
   lastMonth = '';
@@ -57,6 +68,54 @@ type MonthlyRainfallStats = { rainfall_in: number; normal_in: number; anomaly_in
 
   monthlyStats = new Map<string, MonthlyRainfallStats>();
   selectedMonthStats: MonthlyRainfallStats | null = null;
+
+  // SPI-3 drought/wetness category history for Panaewa (diverging stacked area chart)
+  spi3Loading = true;
+  spi3Error = '';
+  spi3UpdateFlag = false;
+  spi3ChartOptions: Highcharts.Options = {
+    chart: { type: 'area' },
+    title: { text: 'SPI-3 Drought & Wetness History' },
+    xAxis: { categories: [], title: { text: 'Month' }, tickInterval: 12 },
+    yAxis: {
+      title: { text: '% of Panaʻewa area' },
+      min: -100,
+      max: 100,
+      labels: { formatter: function (): string { return Math.abs(Number(this.value)) + '%'; } }
+    },
+    tooltip: {
+      shared: true,
+      valueDecimals: 1,
+      formatter: function (): string {
+        const points = (this as any).points ?? [];
+        const header = `<b>${(this as any).x}</b><br/>`;
+        return header + points
+          .filter((p: any) => p.y !== 0)
+          .map((p: any) => `${p.series.name}: ${Math.abs(p.y).toFixed(1)}%`)
+          .join('<br/>');
+      }
+    },
+    plotOptions: {
+      area: { stacking: 'normal', marker: { enabled: false }, lineWidth: 0.5 }
+    },
+    series: [
+      // Dry stack: listed innermost (closest to zero) to outermost (most extreme), since
+      // Highcharts stacks negative values outward from zero in series order.
+      { name: 'Near Normal', type: 'area', stack: 'dry', data: [], color: '#E5E5E5', showInLegend: false },
+      { name: 'D0 (Abnormally Dry)', type: 'area', stack: 'dry', data: [], color: '#FFFF00' },
+      { name: 'D1 (Moderate Drought)', type: 'area', stack: 'dry', data: [], color: '#FFD37F' },
+      { name: 'D2 (Severe Drought)', type: 'area', stack: 'dry', data: [], color: '#FF9900' },
+      { name: 'D3 (Extreme Drought)', type: 'area', stack: 'dry', data: [], color: '#FF0000' },
+      { name: 'D4 (Exceptional Drought)', type: 'area', stack: 'dry', data: [], color: '#730000' },
+      // Wet stack: innermost to outermost, same idea for positive values.
+      { name: 'Near Normal ', type: 'area', stack: 'wet', data: [], color: '#E5E5E5' },
+      { name: 'W0 (Abnormally Wet)', type: 'area', stack: 'wet', data: [], color: '#99CCFF' },
+      { name: 'W1 (Moderately Wet)', type: 'area', stack: 'wet', data: [], color: '#0066CC' },
+      { name: 'W2 (Severely Wet)', type: 'area', stack: 'wet', data: [], color: '#0066CC' },
+      { name: 'W3 (Extremely Wet)', type: 'area', stack: 'wet', data: [], color: '#003366' },
+      { name: 'W4 (Exceptionally Wet)', type: 'area', stack: 'wet', data: [], color: '#001933' }
+    ]
+  };
 
   rangeUpdateFlag = false;
   rangeChartOptions: Highcharts.Options = {
@@ -184,7 +243,7 @@ Highcharts: typeof Highcharts = Highcharts;
         if (vars.tmean_diff !== undefined) {
           const diff = vars.tmean_diff;
           this.monthlyTempDiff = `${diff > 0 ? '+' : ''}${diff.toFixed(1)} °F`;
-          console.log('Temp Diff:', this.monthlyTempDiff);
+          // console.log('Temp Diff:', this.monthlyTempDiff);
         } else {
           this.monthlyTempDiff = 'N/A';
         }
@@ -289,6 +348,79 @@ Highcharts: typeof Highcharts = Highcharts;
         },
         error: (err) => console.error('Failed to load monthly rainfall stats', err)
       });
+
+    // 6. Load SPI-3 drought/wetness category history for Panaewa
+    this.http.get('https://raw.githubusercontent.com/cherryleh/panaewa/refs/heads/main/panaewa-app/public/spi3_distribution_panaewa.csv', { responseType: 'text' })
+      .subscribe({
+        next: (csv) => this.plotSpi3(csv),
+        error: (err) => {
+          console.error('Failed to load SPI-3 history', err);
+          this.spi3Error = 'Could not load drought/wetness history.';
+          this.spi3Loading = false;
+        }
+      });
+  }
+
+  private plotSpi3(csv: string): void {
+    const lines = csv.trim().split('\n');
+    const header = lines.shift();
+    if (!header) {
+      this.spi3Error = 'No drought/wetness history data found.';
+      this.spi3Loading = false;
+      return;
+    }
+    const columns = header.split(',').slice(1) as Spi3Label[];
+
+    const categories: string[] = [];
+    const seriesData: Record<Spi3Label, (number | null)[]> = SPI3_LABELS.reduce((acc, l) => {
+      acc[l] = [];
+      return acc;
+    }, {} as Record<Spi3Label, (number | null)[]>);
+
+    for (const line of lines) {
+      const parts = line.split(',');
+      const month = parts[0];
+      const [y, m] = month.split('-').map(Number);
+      categories.push(new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+
+      const row: Partial<Spi3MonthPct> = {};
+      columns.forEach((label, i) => {
+        const raw = parts[i + 1];
+        row[label] = raw === '' || raw === undefined ? null : Number(raw);
+      });
+
+      for (const label of SPI3_LABELS) {
+        const v = row[label] ?? null;
+        seriesData[label].push(v);
+      }
+    }
+
+    // Diverging chart: drought categories go negative, wet categories stay positive,
+    // "Near Normal" is split evenly between the two stacks.
+    const dryData = seriesData['Near Normal'].map(v => v === null ? null : -(v / 2));
+    const wetData = seriesData['Near Normal'].map(v => v === null ? null : v / 2);
+    const negate = (arr: (number | null)[]) => arr.map(v => v === null ? null : -v);
+
+    this.spi3ChartOptions = {
+      ...this.spi3ChartOptions,
+      xAxis: { ...(this.spi3ChartOptions.xAxis as Highcharts.XAxisOptions), categories },
+      series: [
+        { ...(this.spi3ChartOptions.series?.[0] as Highcharts.SeriesAreaOptions), data: dryData },
+        { ...(this.spi3ChartOptions.series?.[1] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D0']) },
+        { ...(this.spi3ChartOptions.series?.[2] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D1']) },
+        { ...(this.spi3ChartOptions.series?.[3] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D2']) },
+        { ...(this.spi3ChartOptions.series?.[4] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D3']) },
+        { ...(this.spi3ChartOptions.series?.[5] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D4']) },
+        { ...(this.spi3ChartOptions.series?.[6] as Highcharts.SeriesAreaOptions), data: wetData },
+        { ...(this.spi3ChartOptions.series?.[7] as Highcharts.SeriesAreaOptions), data: seriesData['W0'] },
+        { ...(this.spi3ChartOptions.series?.[8] as Highcharts.SeriesAreaOptions), data: seriesData['W1'] },
+        { ...(this.spi3ChartOptions.series?.[9] as Highcharts.SeriesAreaOptions), data: seriesData['W2'] },
+        { ...(this.spi3ChartOptions.series?.[10] as Highcharts.SeriesAreaOptions), data: seriesData['W3'] },
+        { ...(this.spi3ChartOptions.series?.[11] as Highcharts.SeriesAreaOptions), data: seriesData['W4'] }
+      ]
+    };
+    this.spi3UpdateFlag = true;
+    this.spi3Loading = false;
   }
 
   get selectedMonth(): MonthOption | null {

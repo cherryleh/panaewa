@@ -1,4 +1,7 @@
-<div class="dashboard-grid">
+<section class="dashboard-section">
+  <h2 class="section-title">Current Conditions</h2>
+
+  <div class="dashboard-grid">
 
     <!-- Rainfall -->
     <div class="card rainfall-card rainfall">
@@ -124,45 +127,75 @@
 
     <!-- Graph -->
     <div class="graph-card graph">
-        <highcharts-chart [Highcharts]="Highcharts" [options]="rainfallChartOptions"
+        <highcharts-chart *ngIf="isBrowser" [Highcharts]="Highcharts" [options]="rainfallChartOptions"
             style="width: 100%; height: 320px; display: block;">
         </highcharts-chart>
     </div>
+  </div>
+</section>
 
-    <!-- Rainfall history browser -->
-    <div class="graph-card graph range-card">
-        <ng-container *ngIf="monthOptions.length > 0; else historyStatusTpl">
-          <div class="range-controls">
-            <button type="button" class="month-nav-btn" (click)="prevMonth()" [disabled]="monthIndex === 0" aria-label="Previous month">&lsaquo;</button>
+<section class="dashboard-section">
+  <h2 class="section-title">Historical Rainfall</h2>
+  <p class="section-desc">
+    Daily rainfall for the Panaʻewa area from 1990 to present. Use the slider to browse
+    month by month, and see how that month's total compares to its long-term average.
+  </p>
 
-            <div class="month-slider-wrap">
-              <span class="month-label">{{ selectedMonth?.label }}</span>
-              <input type="range" class="month-slider" [min]="0" [max]="monthOptions.length - 1" [value]="monthIndex"
-                     (input)="onMonthSliderChange($any($event.target).valueAsNumber)">
-              <div class="range-hint">
-                <span>{{ monthOptions[0].year }}</span>
-                <span>{{ monthOptions[monthOptions.length - 1].year }}</span>
-              </div>
+  <!-- Rainfall history browser -->
+  <div class="graph-card range-card">
+      <ng-container *ngIf="monthOptions.length > 0; else historyStatusTpl">
+        <div class="range-controls">
+          <button type="button" class="month-nav-btn" (click)="prevMonth()" [disabled]="monthIndex === 0" aria-label="Previous month">&lsaquo;</button>
+
+          <div class="month-slider-wrap">
+            <span class="month-label">{{ selectedMonth?.label }}</span>
+            <input type="range" class="month-slider" [min]="0" [max]="monthOptions.length - 1" [value]="monthIndex"
+                   (input)="onMonthSliderChange($any($event.target).valueAsNumber)">
+            <div class="range-hint">
+              <span>{{ monthOptions[0].year }}</span>
+              <span>{{ monthOptions[monthOptions.length - 1].year }}</span>
             </div>
+          </div>
 
-            <button type="button" class="month-nav-btn" (click)="nextMonth()" [disabled]="monthIndex === monthOptions.length - 1" aria-label="Next month">&rsaquo;</button>
-          </div>
-          <div class="month-anomaly" *ngIf="selectedMonthStats as stats">
-            <span class="anomaly-total">{{ stats.rainfall_in }} in</span>
-            <span class="anomaly-vs">vs. {{ stats.normal_in }} in normal</span>
-            <span class="anomaly-pct"
-                  [ngClass]="{'positive': (stats.anomaly_pct ?? 0) > 0, 'negative': (stats.anomaly_pct ?? 0) < 0}"
-                  *ngIf="stats.anomaly_pct !== null">
-              {{ stats.anomaly_pct > 0 ? '+' : '' }}{{ stats.anomaly_pct }}%
-            </span>
-          </div>
-          <highcharts-chart [Highcharts]="Highcharts" [options]="rangeChartOptions" [(update)]="rangeUpdateFlag"
-              style="width: 100%; height: 320px; display: block;">
-          </highcharts-chart>
-        </ng-container>
-        <ng-template #historyStatusTpl>
-          <p class="value" *ngIf="historyLoading">Loading rainfall history…</p>
-          <p class="range-error" *ngIf="!historyLoading && historyError">{{ historyError }}</p>
-        </ng-template>
-    </div>
-</div>
+          <button type="button" class="month-nav-btn" (click)="nextMonth()" [disabled]="monthIndex === monthOptions.length - 1" aria-label="Next month">&rsaquo;</button>
+        </div>
+        <div class="month-anomaly" *ngIf="selectedMonthStats as stats">
+          <span class="anomaly-total">{{ stats.rainfall_in }} in</span>
+          <span class="anomaly-vs">vs. {{ stats.normal_in }} in on average</span>
+          <span class="anomaly-pct"
+                [ngClass]="{'positive': stats.anomaly_pct > 0, 'negative': stats.anomaly_pct < 0}"
+                *ngIf="stats.anomaly_pct !== null">
+            {{ stats.anomaly_pct > 0 ? '+' : '' }}{{ stats.anomaly_pct }}%
+          </span>
+        </div>
+        <highcharts-chart *ngIf="isBrowser" [Highcharts]="Highcharts" [options]="rangeChartOptions" [(update)]="rangeUpdateFlag"
+            style="width: 100%; height: 320px; display: block;">
+        </highcharts-chart>
+      </ng-container>
+      <ng-template #historyStatusTpl>
+        <p class="value" *ngIf="historyLoading">Loading rainfall history…</p>
+        <p class="range-error" *ngIf="!historyLoading && historyError">{{ historyError }}</p>
+      </ng-template>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <h2 class="section-title">Drought & Wetness History</h2>
+  <p class="section-desc">
+    Percent of the Panaʻewa area in each SPI-3 (3-month Standardized Precipitation Index)
+    category, from 1990 to present. Drought categories extend downward, wet categories
+    extend upward; the wider the band, the more of the area was in that category that month.
+  </p>
+
+  <div class="graph-card spi3-card">
+    <ng-container *ngIf="!spi3Error; else spi3ErrorTpl">
+      <p class="value" *ngIf="spi3Loading">Loading drought/wetness history…</p>
+      <highcharts-chart *ngIf="isBrowser && !spi3Loading" [Highcharts]="Highcharts" [options]="spi3ChartOptions" [(update)]="spi3UpdateFlag"
+          style="width: 100%; height: 420px; display: block;">
+      </highcharts-chart>
+    </ng-container>
+    <ng-template #spi3ErrorTpl>
+      <p class="range-error">{{ spi3Error }}</p>
+    </ng-template>
+  </div>
+</section>
