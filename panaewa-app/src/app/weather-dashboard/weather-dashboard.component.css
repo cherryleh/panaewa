@@ -143,6 +143,71 @@
   grid-row: 3;
 }
 
+.range-card {
+  grid-row: 4;
+}
+
+.range-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.month-slider-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.month-label {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.month-slider {
+  width: 100%;
+  accent-color: #007bff;
+}
+
+.range-hint {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+.month-nav-btn {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #333;
+}
+
+.month-nav-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.month-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.range-error {
+  color: #c0392b;
+  font-size: 0.9rem;
+}
+
 
 .card .comparison {
   font-size: 1vw;

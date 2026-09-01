@@ -128,4 +128,32 @@
             style="width: 100%; height: 320px; display: block;">
         </highcharts-chart>
     </div>
+
+    <!-- Rainfall history browser -->
+    <div class="graph-card graph range-card">
+        <ng-container *ngIf="monthOptions.length > 0; else historyStatusTpl">
+          <div class="range-controls">
+            <button type="button" class="month-nav-btn" (click)="prevMonth()" [disabled]="monthIndex === 0" aria-label="Previous month">&lsaquo;</button>
+
+            <div class="month-slider-wrap">
+              <span class="month-label">{{ selectedMonth?.label }}</span>
+              <input type="range" class="month-slider" [min]="0" [max]="monthOptions.length - 1" [value]="monthIndex"
+                     (input)="onMonthSliderChange($any($event.target).valueAsNumber)">
+              <div class="range-hint">
+                <span>{{ monthOptions[0].year }}</span>
+                <span>{{ monthOptions[monthOptions.length - 1].year }}</span>
+              </div>
+            </div>
+
+            <button type="button" class="month-nav-btn" (click)="nextMonth()" [disabled]="monthIndex === monthOptions.length - 1" aria-label="Next month">&rsaquo;</button>
+          </div>
+          <highcharts-chart [Highcharts]="Highcharts" [options]="rangeChartOptions" [(update)]="rangeUpdateFlag"
+              style="width: 100%; height: 320px; display: block;">
+          </highcharts-chart>
+        </ng-container>
+        <ng-template #historyStatusTpl>
+          <p class="value" *ngIf="historyLoading">Loading rainfall history…</p>
+          <p class="range-error" *ngIf="!historyLoading && historyError">{{ historyError }}</p>
+        </ng-template>
+    </div>
 </div>

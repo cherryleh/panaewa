@@ -22,6 +22,8 @@ type WeatherVars = {
   drought: string;
   air_quality: string
 };
+type RainfallHistoryPoint = { date: string; value: number | null };
+type MonthOption = { year: number; month: number; label: string };
 
 @Component({
   selector: 'app-weather-dashboard',
@@ -44,6 +46,30 @@ type WeatherVars = {
   monthlyRainfallChange = '';
   dailyTempDiff = '';
   monthlyTempDiff = '';
+
+  // Rainfall history browser: full 1990-present dataset, one month shown at a time via slider
+  rainfallHistory: RainfallHistoryPoint[] = [];
+  monthOptions: MonthOption[] = [];
+  monthIndex = 0;
+  historyLoading = true;
+  historyError = '';
+
+  rangeUpdateFlag = false;
+  rangeChartOptions: Highcharts.Options = {
+    title: { text: 'Rainfall History' },
+    xAxis: { categories: [], title: { text: 'Day' } },
+    yAxis: { title: { text: 'Rainfall (in)' } },
+    tooltip: { valueDecimals: 2 },
+    series: [
+      {
+        name: 'Rainfall',
+        type: 'column',
+        data: [],
+        borderWidth: 0,
+        color: '#007bff'
+      }
+    ]
+  };
 
 
 
@@ -192,5 +218,92 @@ Highcharts: typeof Highcharts = Highcharts;
         this.windLoading = false;
       }
     });
+
+    // 4. Load full rainfall history (browse one month at a time via the slider below)
+    this.http.get('https://raw.githubusercontent.com/cherryleh/panaewa/refs/heads/main/panaewa-app/public/rainfall_daily_1990_present.csv', { responseType: 'text' })
+      .subscribe({
+        next: (csv) => {
+          const lines = csv.trim().split('\n');
+          lines.shift(); // drop header row
+
+          this.rainfallHistory = lines.map(line => {
+            const [date, value] = line.split(',');
+            return { date, value: value === '' || value === undefined ? null : Number(value) };
+          });
+
+          if (this.rainfallHistory.length > 0) {
+            const [firstY, firstM] = this.rainfallHistory[0].date.split('-').map(Number);
+            const [lastY, lastM] = this.rainfallHistory[this.rainfallHistory.length - 1].date.split('-').map(Number);
+
+            const months: MonthOption[] = [];
+            let y = firstY, m = firstM;
+            while (y < lastY || (y === lastY && m <= lastM)) {
+              months.push({
+                year: y,
+                month: m,
+                label: new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+              });
+              m++;
+              if (m > 12) { m = 1; y++; }
+            }
+
+            this.monthOptions = months;
+            this.monthIndex = months.length - 1; // default to most recent month
+            this.plotMonth();
+          } else {
+            this.historyError = 'No rainfall history data found.';
+          }
+          this.historyLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to load rainfall history', err);
+          this.historyError = 'Could not load rainfall history.';
+          this.historyLoading = false;
+        }
+      });
+  }
+
+  get selectedMonth(): MonthOption | null {
+    return this.monthOptions[this.monthIndex] ?? null;
+  }
+
+  onMonthSliderChange(value: number): void {
+    this.monthIndex = value;
+    this.plotMonth();
+  }
+
+  prevMonth(): void {
+    if (this.monthIndex > 0) {
+      this.monthIndex--;
+      this.plotMonth();
+    }
+  }
+
+  nextMonth(): void {
+    if (this.monthIndex < this.monthOptions.length - 1) {
+      this.monthIndex++;
+      this.plotMonth();
+    }
+  }
+
+  plotMonth(): void {
+    const selected = this.selectedMonth;
+    if (!selected) return;
+
+    const prefix = `${selected.year}-${String(selected.month).padStart(2, '0')}`;
+    const points = this.rainfallHistory.filter(p => p.date.startsWith(prefix));
+
+    const categories = points.map(p => p.date.split('-')[2]);
+    const data = points.map(p => p.value);
+
+    this.rangeChartOptions = {
+      ...this.rangeChartOptions,
+      title: { text: `Rainfall - ${selected.label}` },
+      xAxis: { ...(this.rangeChartOptions.xAxis as Highcharts.XAxisOptions), categories },
+      series: [
+        { ...(this.rangeChartOptions.series?.[0] as Highcharts.SeriesColumnOptions), data }
+      ]
+    };
+    this.rangeUpdateFlag = true;
   }
 }
