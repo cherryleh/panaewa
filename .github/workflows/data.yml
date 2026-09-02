@@ -63,4 +63,9 @@ jobs:
           git config user.email "github-actions@github.com"
           git add ./panaewa-app/public/*.json ./panaewa-app/public/*.csv ./panaewa-app/data/rainfall_daily_1990_present.csv ./panaewa-app/data/spi3_distribution_panaewa.csv
           git commit -m "Update weather data" || echo "No changes to commit"
-          git push
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main
+            git push && break
+            echo "Push rejected (attempt $i), retrying after rebase..."
+            sleep 5
+          done
