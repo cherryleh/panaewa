@@ -190,9 +190,27 @@
   <div class="graph-card spi3-card">
     <ng-container *ngIf="!spi3Error; else spi3ErrorTpl">
       <p class="value" *ngIf="spi3Loading">Loading drought/wetness history…</p>
-      <highcharts-chart *ngIf="isBrowser && !spi3Loading" [Highcharts]="Highcharts" [options]="spi3ChartOptions" [(update)]="spi3UpdateFlag"
-          style="width: 100%; height: 420px; display: block;">
-      </highcharts-chart>
+
+      <ng-container *ngIf="!spi3Loading">
+        <div class="range-controls">
+          <button type="button" class="month-nav-btn" (click)="spi3PrevWindow()" [disabled]="spi3WindowStartIndex === 0" aria-label="Earlier years">&lsaquo;</button>
+
+          <div class="month-slider-wrap">
+            <span class="month-label">{{ spi3WindowLabel }}</span>
+            <input type="range" class="month-slider" [min]="0" [max]="spi3Years.length - spi3WindowYears" [value]="spi3WindowStartIndex"
+                   (input)="onSpi3WindowChange($any($event.target).valueAsNumber)">
+            <div class="range-hint">
+              <span>{{ spi3Years[0] }}</span>
+              <span>{{ spi3Years[spi3Years.length - 1] }}</span>
+            </div>
+          </div>
+
+          <button type="button" class="month-nav-btn" (click)="spi3NextWindow()" [disabled]="spi3WindowStartIndex >= spi3Years.length - spi3WindowYears" aria-label="Later years">&rsaquo;</button>
+        </div>
+        <highcharts-chart *ngIf="isBrowser" [Highcharts]="Highcharts" [options]="spi3ChartOptions" [(update)]="spi3UpdateFlag"
+            style="width: 100%; height: 420px; display: block;">
+        </highcharts-chart>
+      </ng-container>
     </ng-container>
     <ng-template #spi3ErrorTpl>
       <p class="range-error">{{ spi3Error }}</p>

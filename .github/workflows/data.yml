@@ -39,6 +39,19 @@ jobs:
           AIRNOW_KEY: ${{ env.AIRNOW_KEY }}
         run: python data.py
 
+      - name: Append latest daily rainfall
+        working-directory: panaewa-app/scripts
+        run: python rainfall_history.py
+
+      - name: Append latest monthly SPI-3 drought data
+        working-directory: panaewa-app/scripts
+        run: python spi3_history.py
+
+      - name: Publish updated CSVs
+        run: |
+          cp panaewa-app/data/rainfall_daily_1990_present.csv panaewa-app/public/rainfall_daily_1990_present.csv
+          cp panaewa-app/data/spi3_distribution_panaewa.csv panaewa-app/public/spi3_distribution_panaewa.csv
+
       - name: List json files
         run: |
           ls -l panaewa-app/public/*.json
@@ -48,6 +61,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add ./panaewa-app/public/*.json
-          git commit -m "Update weather data"
+          git add ./panaewa-app/public/*.json ./panaewa-app/public/*.csv ./panaewa-app/data/rainfall_daily_1990_present.csv ./panaewa-app/data/spi3_distribution_panaewa.csv
+          git commit -m "Update weather data" || echo "No changes to commit"
           git push

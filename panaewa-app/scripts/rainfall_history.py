@@ -61,11 +61,14 @@ def get_session():
 
 
 def already_done_dates():
+    """Dates with a real value already recorded. Blank rows (no raster
+    published yet for that date) are excluded so they get retried on the
+    next run instead of being skipped forever."""
     if not os.path.exists(OUT_CSV):
         return set()
     with open(OUT_CSV, newline="") as f:
         reader = csv.DictReader(f)
-        return {row["date"] for row in reader}
+        return {row["date"] for row in reader if row["rainfall_in"] != ""}
 
 
 def fetch_daily_mean_mm(day: date):
@@ -160,11 +163,21 @@ def main():
 
 def sort_csv_by_date():
     """Rows are appended in completion order (not chronological, since
-    fetches run concurrently) - sort the file once everything is written."""
+    fetches run concurrently) - sort the file once everything is written.
+    Also dedupes: on repeated runs a date may have an old blank placeholder
+    row (no data was published yet) alongside a newer row with real data -
+    keep the real one."""
     with open(OUT_CSV, newline="") as f:
         reader = csv.reader(f)
         header = next(reader)
-        rows = sorted(reader, key=lambda row: row[0])
+        rows_by_date = {}
+        for row in reader:
+            date_key = row[0]
+            is_blank = row[1] == ""
+            existing = rows_by_date.get(date_key)
+            if existing is None or (existing[1] == "" and not is_blank):
+                rows_by_date[date_key] = row
+    rows = sorted(rows_by_date.values(), key=lambda row: row[0])
     with open(OUT_CSV, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(header)

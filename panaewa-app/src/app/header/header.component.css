@@ -20,6 +20,27 @@
   align-items: center;
 }
 
+.brand {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.brand h2 {
+  margin: 0;
+  font-size: clamp(1rem, 3.2vw, 1.5rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand p {
+  margin: 0;
+  font-size: clamp(0.65rem, 2vw, 0.9rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 nav {
   display: flex;
   gap: 20px;

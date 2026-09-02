@@ -95,11 +95,15 @@ def month_range(start, end):
 
 
 def already_done_months():
+    """Months with real data already recorded. Blank rows (raster not
+    published yet for that month, e.g. the current in-progress month) are
+    excluded so they get retried on the next run instead of being skipped
+    forever."""
     if not os.path.exists(OUT_CSV):
         return set()
     with open(OUT_CSV, newline="") as f:
         reader = csv.DictReader(f)
-        return {row["month"] for row in reader}
+        return {row["month"] for row in reader if row[LABELS[0]] != ""}
 
 
 def fetch_panaewa_spi3(year: int, month: int):
@@ -200,10 +204,20 @@ def main():
 
 
 def sort_csv_by_month():
+    """Dedupe on repeated runs: a month may have an old blank placeholder
+    row (no data published yet) alongside a newer row with real data -
+    keep the real one."""
     with open(OUT_CSV, newline="") as f:
         reader = csv.reader(f)
         header = next(reader)
-        rows = sorted(reader, key=lambda row: row[0])
+        rows_by_month = {}
+        for row in reader:
+            month_key = row[0]
+            is_blank = row[1] == ""
+            existing = rows_by_month.get(month_key)
+            if existing is None or (existing[1] == "" and not is_blank):
+                rows_by_month[month_key] = row
+    rows = sorted(rows_by_month.values(), key=lambda row: row[0])
     with open(OUT_CSV, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(header)

@@ -73,6 +73,14 @@ type Spi3MonthPct = Record<Spi3Label, number | null>;
   spi3Loading = true;
   spi3Error = '';
   spi3UpdateFlag = false;
+  readonly spi3WindowYears = 3;
+  spi3Months: string[] = [];
+  spi3Years: number[] = [];
+  spi3WindowStartIndex = 0;
+  spi3SeriesData: Record<Spi3Label, (number | null)[]> = SPI3_LABELS.reduce((acc, l) => {
+    acc[l] = [];
+    return acc;
+  }, {} as Record<Spi3Label, (number | null)[]>);
   spi3ChartOptions: Highcharts.Options = {
     chart: { type: 'area' },
     title: { text: 'SPI-3 Drought & Wetness History' },
@@ -81,6 +89,11 @@ type Spi3MonthPct = Record<Spi3Label, number | null>;
       title: { text: '% of Panaʻewa area' },
       min: -100,
       max: 100,
+      // Stacked area charts can otherwise let Highcharts auto-widen the computed
+      // extremes beyond the explicit min/max - force the exact ticks we want.
+      tickPositions: [-100, -50, 0, 50, 100],
+      startOnTick: false,
+      endOnTick: false,
       labels: { formatter: function (): string { return Math.abs(Number(this.value)) + '%'; } }
     },
     tooltip: {
@@ -88,7 +101,8 @@ type Spi3MonthPct = Record<Spi3Label, number | null>;
       valueDecimals: 1,
       formatter: function (): string {
         const points = (this as any).points ?? [];
-        const header = `<b>${(this as any).x}</b><br/>`;
+        const label = points[0]?.point?.category ?? (this as any).x;
+        const header = `<b>${label}</b><br/>`;
         return header + points
           .filter((p: any) => p.y !== 0)
           .map((p: any) => `${p.series.name}: ${Math.abs(p.y).toFixed(1)}%`)
@@ -96,21 +110,19 @@ type Spi3MonthPct = Record<Spi3Label, number | null>;
       }
     },
     plotOptions: {
-      area: { stacking: 'normal', marker: { enabled: false }, lineWidth: 0.5 }
+      area: { stacking: 'normal', marker: { enabled: false }, lineWidth: 0.5, fillOpacity: 1 }
     },
     series: [
       // Dry stack: listed innermost (closest to zero) to outermost (most extreme), since
       // Highcharts stacks negative values outward from zero in series order.
-      { name: 'Near Normal', type: 'area', stack: 'dry', data: [], color: '#E5E5E5', showInLegend: false },
       { name: 'D0 (Abnormally Dry)', type: 'area', stack: 'dry', data: [], color: '#FFFF00' },
       { name: 'D1 (Moderate Drought)', type: 'area', stack: 'dry', data: [], color: '#FFD37F' },
       { name: 'D2 (Severe Drought)', type: 'area', stack: 'dry', data: [], color: '#FF9900' },
       { name: 'D3 (Extreme Drought)', type: 'area', stack: 'dry', data: [], color: '#FF0000' },
       { name: 'D4 (Exceptional Drought)', type: 'area', stack: 'dry', data: [], color: '#730000' },
       // Wet stack: innermost to outermost, same idea for positive values.
-      { name: 'Near Normal ', type: 'area', stack: 'wet', data: [], color: '#E5E5E5' },
       { name: 'W0 (Abnormally Wet)', type: 'area', stack: 'wet', data: [], color: '#99CCFF' },
-      { name: 'W1 (Moderately Wet)', type: 'area', stack: 'wet', data: [], color: '#0066CC' },
+      { name: 'W1 (Moderately Wet)', type: 'area', stack: 'wet', data: [], color: '#4D94DB' },
       { name: 'W2 (Severely Wet)', type: 'area', stack: 'wet', data: [], color: '#0066CC' },
       { name: 'W3 (Extremely Wet)', type: 'area', stack: 'wet', data: [], color: '#003366' },
       { name: 'W4 (Exceptionally Wet)', type: 'area', stack: 'wet', data: [], color: '#001933' }
@@ -371,7 +383,7 @@ Highcharts: typeof Highcharts = Highcharts;
     }
     const columns = header.split(',').slice(1) as Spi3Label[];
 
-    const categories: string[] = [];
+    const months: string[] = [];
     const seriesData: Record<Spi3Label, (number | null)[]> = SPI3_LABELS.reduce((acc, l) => {
       acc[l] = [];
       return acc;
@@ -380,8 +392,7 @@ Highcharts: typeof Highcharts = Highcharts;
     for (const line of lines) {
       const parts = line.split(',');
       const month = parts[0];
-      const [y, m] = month.split('-').map(Number);
-      categories.push(new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+      months.push(month);
 
       const row: Partial<Spi3MonthPct> = {};
       columns.forEach((label, i) => {
@@ -395,32 +406,80 @@ Highcharts: typeof Highcharts = Highcharts;
       }
     }
 
-    // Diverging chart: drought categories go negative, wet categories stay positive,
-    // "Near Normal" is split evenly between the two stacks.
-    const dryData = seriesData['Near Normal'].map(v => v === null ? null : -(v / 2));
-    const wetData = seriesData['Near Normal'].map(v => v === null ? null : v / 2);
+    this.spi3Months = months;
+    this.spi3SeriesData = seriesData;
+    this.spi3Years = [...new Set(months.map(m => Number(m.split('-')[0])))].sort((a, b) => a - b);
+    this.spi3WindowStartIndex = Math.max(0, this.spi3Years.length - this.spi3WindowYears);
+
+    this.updateSpi3Chart();
+    this.spi3Loading = false;
+  }
+
+  get spi3WindowLabel(): string {
+    if (this.spi3Years.length === 0) return '';
+    const startYear = this.spi3Years[this.spi3WindowStartIndex];
+    const endYear = this.spi3Years[Math.min(this.spi3WindowStartIndex + this.spi3WindowYears - 1, this.spi3Years.length - 1)];
+    return startYear === endYear ? `${startYear}` : `${startYear} – ${endYear}`;
+  }
+
+  onSpi3WindowChange(value: number): void {
+    this.spi3WindowStartIndex = value;
+    this.updateSpi3Chart();
+  }
+
+  spi3PrevWindow(): void {
+    if (this.spi3WindowStartIndex > 0) {
+      this.spi3WindowStartIndex--;
+      this.updateSpi3Chart();
+    }
+  }
+
+  spi3NextWindow(): void {
+    if (this.spi3WindowStartIndex < this.spi3Years.length - this.spi3WindowYears) {
+      this.spi3WindowStartIndex++;
+      this.updateSpi3Chart();
+    }
+  }
+
+  private updateSpi3Chart(): void {
+    if (this.spi3Years.length === 0) return;
+
+    const startYear = this.spi3Years[this.spi3WindowStartIndex];
+    const endYear = this.spi3Years[Math.min(this.spi3WindowStartIndex + this.spi3WindowYears - 1, this.spi3Years.length - 1)];
+
+    const indices = this.spi3Months
+      .map((m, i) => ({ m, i }))
+      .filter(({ m }) => {
+        const y = Number(m.split('-')[0]);
+        return y >= startYear && y <= endYear;
+      })
+      .map(({ i }) => i);
+
+    const categories = indices.map(i => {
+      const [y, m] = this.spi3Months[i].split('-').map(Number);
+      return new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    });
+
+    const slice = (arr: (number | null)[]) => indices.map(i => arr[i]);
     const negate = (arr: (number | null)[]) => arr.map(v => v === null ? null : -v);
 
     this.spi3ChartOptions = {
       ...this.spi3ChartOptions,
       xAxis: { ...(this.spi3ChartOptions.xAxis as Highcharts.XAxisOptions), categories },
       series: [
-        { ...(this.spi3ChartOptions.series?.[0] as Highcharts.SeriesAreaOptions), data: dryData },
-        { ...(this.spi3ChartOptions.series?.[1] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D0']) },
-        { ...(this.spi3ChartOptions.series?.[2] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D1']) },
-        { ...(this.spi3ChartOptions.series?.[3] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D2']) },
-        { ...(this.spi3ChartOptions.series?.[4] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D3']) },
-        { ...(this.spi3ChartOptions.series?.[5] as Highcharts.SeriesAreaOptions), data: negate(seriesData['D4']) },
-        { ...(this.spi3ChartOptions.series?.[6] as Highcharts.SeriesAreaOptions), data: wetData },
-        { ...(this.spi3ChartOptions.series?.[7] as Highcharts.SeriesAreaOptions), data: seriesData['W0'] },
-        { ...(this.spi3ChartOptions.series?.[8] as Highcharts.SeriesAreaOptions), data: seriesData['W1'] },
-        { ...(this.spi3ChartOptions.series?.[9] as Highcharts.SeriesAreaOptions), data: seriesData['W2'] },
-        { ...(this.spi3ChartOptions.series?.[10] as Highcharts.SeriesAreaOptions), data: seriesData['W3'] },
-        { ...(this.spi3ChartOptions.series?.[11] as Highcharts.SeriesAreaOptions), data: seriesData['W4'] }
+        { ...(this.spi3ChartOptions.series?.[0] as Highcharts.SeriesAreaOptions), data: negate(slice(this.spi3SeriesData['D0'])) },
+        { ...(this.spi3ChartOptions.series?.[1] as Highcharts.SeriesAreaOptions), data: negate(slice(this.spi3SeriesData['D1'])) },
+        { ...(this.spi3ChartOptions.series?.[2] as Highcharts.SeriesAreaOptions), data: negate(slice(this.spi3SeriesData['D2'])) },
+        { ...(this.spi3ChartOptions.series?.[3] as Highcharts.SeriesAreaOptions), data: negate(slice(this.spi3SeriesData['D3'])) },
+        { ...(this.spi3ChartOptions.series?.[4] as Highcharts.SeriesAreaOptions), data: negate(slice(this.spi3SeriesData['D4'])) },
+        { ...(this.spi3ChartOptions.series?.[5] as Highcharts.SeriesAreaOptions), data: slice(this.spi3SeriesData['W0']) },
+        { ...(this.spi3ChartOptions.series?.[6] as Highcharts.SeriesAreaOptions), data: slice(this.spi3SeriesData['W1']) },
+        { ...(this.spi3ChartOptions.series?.[7] as Highcharts.SeriesAreaOptions), data: slice(this.spi3SeriesData['W2']) },
+        { ...(this.spi3ChartOptions.series?.[8] as Highcharts.SeriesAreaOptions), data: slice(this.spi3SeriesData['W3']) },
+        { ...(this.spi3ChartOptions.series?.[9] as Highcharts.SeriesAreaOptions), data: slice(this.spi3SeriesData['W4']) }
       ]
     };
     this.spi3UpdateFlag = true;
-    this.spi3Loading = false;
   }
 
   get selectedMonth(): MonthOption | null {
