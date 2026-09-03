@@ -7,6 +7,7 @@ import json
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import os
+import time
 from zoneinfo import ZoneInfo
 
 
@@ -36,22 +37,37 @@ lastMonth = last_month_hst.month
 lastMonthYr = last_month_hst.year
 
 
-def get_tif(url, file):
+def get_tif(url, file, retries=3, backoff=30, timeout=60):
     print(f"Requesting: {url}")
-    r = requests.get(url, headers=header)
-    print("HTTP status:", r.status_code)
 
-    if r.status_code == 404:
-        print("→ Raster not available, skipping")
-        return False
+    for attempt in range(1, retries + 1):
+        try:
+            r = requests.get(url, headers=header, timeout=timeout)
+        except requests.exceptions.RequestException as e:
+            print(f"Attempt {attempt}/{retries} failed: {e}")
+            if attempt == retries:
+                raise
+            time.sleep(backoff * attempt)
+            continue
 
-    r.raise_for_status()
+        print("HTTP status:", r.status_code)
 
-    with open(file, "wb") as f:
-        f.write(r.content)
+        if r.status_code == 404:
+            print("→ Raster not available, skipping")
+            return False
 
-    print("Saved:", file, "(", os.path.getsize(file), "bytes )")
-    return True
+        if r.status_code >= 500 and attempt < retries:
+            print(f"Attempt {attempt}/{retries} got HTTP {r.status_code}, retrying...")
+            time.sleep(backoff * attempt)
+            continue
+
+        r.raise_for_status()
+
+        with open(file, "wb") as f:
+            f.write(r.content)
+
+        print("Saved:", file, "(", os.path.getsize(file), "bytes )")
+        return True
 
 
 
@@ -87,19 +103,31 @@ for i in range(0, 7):
 
 rh_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={yestYr}-{yestMonth:02d}-{yestDay:02d}&datatype=relative_humidity&period=day'
 rh_file=os.path.join(data_path, "relative_humidity_daily.tif")
-get_tif(rh_url, rh_file)
+try:
+    get_tif(rh_url, rh_file)
+except Exception as e:
+    print(f"Failed to download {rh_file}: {e}")
 
 spi_url = f'https://api.hcdp.ikewai.org/raster?date={yestYr}-{lastMonth:02d}&datatype=spi&timescale=timescale003&period=month'
 spi3_file = os.path.join(data_path, "spi3.tif")
-get_tif(spi_url, spi3_file)
+try:
+    get_tif(spi_url, spi3_file)
+except Exception as e:
+    print(f"Failed to download {spi3_file}: {e}")
 
 temp_m_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={lastMonthYr}-{lastMonth:02d}&datatype=temperature&period=month&aggregation=mean'
 temp_m_file=os.path.join(data_path, "tmean_monthly.tif")
-get_tif(temp_m_url, temp_m_file)
+try:
+    get_tif(temp_m_url, temp_m_file)
+except Exception as e:
+    print(f"Failed to download {temp_m_file}: {e}")
 
 rf_m_url = f'https://api.hcdp.ikewai.org/raster?extent=statewide&date={lastMonthYr}-{lastMonth:02d}&datatype=rainfall&period=month&production=new'
 rf_m_file=os.path.join(data_path, "rainfall_monthly.tif")
-get_tif(rf_m_url, rf_m_file)
+try:
+    get_tif(rf_m_url, rf_m_file)
+except Exception as e:
+    print(f"Failed to download {rf_m_file}: {e}")
 
 ranchshp = gpd.read_file(os.path.join(data_path, "panaewa.shp"))
 rh_file=os.path.join(data_path, "relative_humidity_daily.tif")
