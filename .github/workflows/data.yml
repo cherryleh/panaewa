@@ -61,7 +61,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add ./panaewa-app/public/*.json ./panaewa-app/public/*.csv ./panaewa-app/data/rainfall_daily_1990_present.csv ./panaewa-app/data/spi3_distribution_panaewa.csv
+          git add -A -- panaewa-app/data panaewa-app/public
           git commit -m "Update weather data" || echo "No changes to commit"
           for i in 1 2 3 4 5; do
             git pull --rebase origin main
