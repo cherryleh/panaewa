@@ -1,0 +1,1 @@
+2021-07-23: HTTPSConnectionPool(host='api.hcdp.ikewai.org', port=443): Max retries exceeded with url: /raster?extent=statewide&date=2021-07-23&datatype=rainfall&period=day&production=new (Caused by ConnectTimeoutError(<HTTPSConnection(host='api.hcdp.ikewai.org', port=443) at 0x7f3011d960e0>, 'Connection to api.hcdp.ikewai.org timed out. (connect timeout=60)'))
