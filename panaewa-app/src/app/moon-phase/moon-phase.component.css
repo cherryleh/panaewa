@@ -14,7 +14,6 @@
   position: relative;
   box-shadow: 0 0 40px rgba(245, 243, 206, 0.3);
   flex-shrink: 0;
-  transform: rotate(-45deg);
 }
 
 .moon-half {
