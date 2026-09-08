@@ -1,16 +1,16 @@
 {
     "YestYr": 2026,
     "YestMonth": 9,
-    "YestDay": 6,
+    "YestDay": 7,
     "LastMonth": 8,
     "LastMonthYr": 2026,
-    "relative_humidity": 69.0,
+    "relative_humidity": 71.0,
     "tmean_daily": 80.0,
     "tmean_monthly": 79.0,
     "tmean_diff": 1.89,
-    "rf_daily": 0.77,
+    "rf_daily": 0.43,
     "rf_monthly": 23.0,
     "rf_pdiff": 113.0,
     "drought": "No",
-    "air_quality": "Good"
+    "air_quality": "Moderate"
 }
