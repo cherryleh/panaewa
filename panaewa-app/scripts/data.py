@@ -6,6 +6,7 @@ from rasterstats import zonal_stats
 import json
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import math
 import os
 import time
 from zoneinfo import ZoneInfo
@@ -16,7 +17,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_TOKEN = os.getenv("HCDP_API_KEY")
-AIRNOW_TOKEN = os.getenv("AIRNOW_KEY")
 
 data_path = '../data'
 public_path = '../public'
@@ -176,24 +176,47 @@ else:
 lat, lon = 19.684, -155.052
 
 
-url = "https://www.airnowapi.org/aq/observation/latLong/current/"
-params = {
-    "format": "application/json",
-    "latitude": lat,
-    "longitude": lon,
-    "distance": 23,         # miles
-    "API_KEY": AIRNOW_TOKEN,
-}
+def distance_km(lat1, lon1, lat2, lon2):
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = p2 - p1, math.radians(lon2 - lon1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 6371 * 2 * math.asin(math.sqrt(a))
 
-# AirNow failures (e.g. the endpoint was retired 2026-10-01) shouldn't block the rest of the update
-try:
-    r = requests.get(url, params=params, timeout=30)
+
+def get_daily_pm25_aqi(day, max_km=37):  # 37 km ~ the 23 mi radius the old AirNow API call used
+    """24-hr PM2.5 AQI for `day` from the nearest AirNow monitor (no API key needed).
+
+    daily_data_v2.dat columns: date|AQSID|site|parameter|units|value|hours|agency|AQI|category|lat|lon|full AQSID
+    """
+    url = f"https://files.airnowtech.org/airnow/{day:%Y}/{day:%Y%m%d}/daily_data_v2.dat"
+    print(f"Requesting: {url}")
+    r = requests.get(url, timeout=60)
     r.raise_for_status()
-    airnow_data = r.json()
-    pm25_aqis = [row.get("AQI") for row in airnow_data if row.get("ParameterName") == "PM2.5" and row.get("AQI") is not None][0]
-except Exception as e:
-    print(f"AirNow request failed: {type(e).__name__}")
-    pm25_aqis = None
+
+    best = None
+    for line in r.text.splitlines():
+        cols = line.split("|")
+        if len(cols) < 12 or cols[3] != "PM2.5-24hr" or cols[8] == "-999":
+            continue
+        dist = distance_km(lat, lon, float(cols[10]), float(cols[11]))
+        if dist <= max_km and (best is None or dist < best[0]):
+            best = (dist, int(cols[8]), cols[2])
+
+    if best is None:
+        return None
+    print(f"PM2.5 24-hr AQI {best[1]} from {best[2]} ({best[0]:.1f} km)")
+    return best[1]
+
+
+# AirNow failures shouldn't block the rest of the update
+pm25_aqis = None
+for days_back in (1, 2):  # fall back a day if yesterday's file isn't posted yet
+    try:
+        pm25_aqis = get_daily_pm25_aqi(now_hst - relativedelta(days=days_back))
+    except Exception as e:
+        print(f"AirNow daily file failed: {type(e).__name__}: {e}")
+    if pm25_aqis is not None:
+        break
 
 if pm25_aqis is None:
     air_quality = "NA"
