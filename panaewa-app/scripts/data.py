@@ -185,12 +185,19 @@ params = {
     "API_KEY": AIRNOW_TOKEN,
 }
 
-r = requests.get(url, params=params, timeout=30)
-r.raise_for_status()
-airnow_data = r.json()
-pm25_aqis = [row.get("AQI") for row in airnow_data if row.get("ParameterName") == "PM2.5" and row.get("AQI") is not None][0]
+# AirNow failures (e.g. the endpoint was retired 2026-10-01) shouldn't block the rest of the update
+try:
+    r = requests.get(url, params=params, timeout=30)
+    r.raise_for_status()
+    airnow_data = r.json()
+    pm25_aqis = [row.get("AQI") for row in airnow_data if row.get("ParameterName") == "PM2.5" and row.get("AQI") is not None][0]
+except Exception as e:
+    print(f"AirNow request failed: {type(e).__name__}")
+    pm25_aqis = None
 
-if pm25_aqis <= 50:
+if pm25_aqis is None:
+    air_quality = "NA"
+elif pm25_aqis <= 50:
     air_quality = "Good"
 elif pm25_aqis <= 100:
     air_quality = "Moderate"
