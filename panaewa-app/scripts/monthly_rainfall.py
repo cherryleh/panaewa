@@ -6,6 +6,7 @@ for that calendar month across all years in the dataset).
 Pure aggregation over the existing daily CSV - no network calls.
 """
 
+import calendar
 import csv
 import os
 from collections import defaultdict
@@ -18,14 +19,21 @@ OUT_CSV = os.path.join(DATA_PATH, "rainfall_monthly_1990_present.csv")
 def main():
     # (year, month) -> [values]
     by_month = defaultdict(list)
+    last_date = None
 
     with open(IN_CSV, newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["rainfall_in"] == "":
                 continue
-            year, month, _ = row["date"].split("-")
+            year, month, day = row["date"].split("-")
             by_month[(int(year), int(month))].append(float(row["rainfall_in"]))
+            last_date = max(last_date or row["date"], row["date"])
+
+    # The month of the latest daily value is still in progress unless that
+    # value is its last day; its total isn't comparable to a normal yet.
+    last_y, last_m, last_d = (int(x) for x in last_date.split("-"))
+    incomplete = None if last_d == calendar.monthrange(last_y, last_m)[1] else (last_y, last_m)
 
     monthly_totals = {ym: round(sum(vals), 2) for ym, vals in by_month.items()}
 
@@ -33,6 +41,8 @@ def main():
     # month's total across every year present in the dataset.
     totals_by_calendar_month = defaultdict(list)
     for (year, month), total in monthly_totals.items():
+        if (year, month) == incomplete:
+            continue
         totals_by_calendar_month[month].append(total)
 
     normals = {
@@ -43,8 +53,11 @@ def main():
     rows = []
     for (year, month), total in sorted(monthly_totals.items()):
         normal = normals[month]
-        anomaly_in = round(total - normal, 2)
-        anomaly_pct = round((anomaly_in / normal) * 100, 1) if normal else None
+        if (year, month) == incomplete:
+            anomaly_in, anomaly_pct = "", None
+        else:
+            anomaly_in = round(total - normal, 2)
+            anomaly_pct = round((anomaly_in / normal) * 100, 1) if normal else None
         rows.append({
             "year_month": f"{year:04d}-{month:02d}",
             "rainfall_in": total,
