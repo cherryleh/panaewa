@@ -170,7 +170,7 @@ elif spi3 <= -0.8:
 elif spi3 <= 0.5:
     drought = "Abnormally Dry"
 else:
-    drought = "No"
+    drought = "None"
 
 
 lat, lon = 19.684, -155.052
