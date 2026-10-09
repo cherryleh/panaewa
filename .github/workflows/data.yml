@@ -43,6 +43,10 @@ jobs:
         working-directory: panaewa-app/scripts
         run: python rainfall_history.py
 
+      - name: Rebuild monthly rainfall totals
+        working-directory: panaewa-app/scripts
+        run: python monthly_rainfall.py
+
       - name: Append latest monthly SPI-3 drought data
         working-directory: panaewa-app/scripts
         run: python spi3_history.py
@@ -51,6 +55,7 @@ jobs:
         run: |
           cp panaewa-app/data/rainfall_daily_1990_present.csv panaewa-app/public/rainfall_daily_1990_present.csv
           cp panaewa-app/data/spi3_distribution_panaewa.csv panaewa-app/public/spi3_distribution_panaewa.csv
+          cp panaewa-app/data/rainfall_monthly_1990_present.csv panaewa-app/public/rainfall_monthly_1990_present.csv
 
       - name: List json files
         run: |
