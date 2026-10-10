@@ -24,8 +24,8 @@ type WeatherVars = {
 };
 type RainfallHistoryPoint = { date: string; value: number | null };
 type MonthOption = { year: number; month: number; label: string };
-// Fixed top of the Rainfall History y-axis (inches); ~83% of months' wettest day fits under it
-const RAINFALL_HISTORY_Y_MAX = 3;
+// Fixed top of the Rainfall History y-axis (inches); ~90% of months' wettest day fits under it
+const RAINFALL_HISTORY_Y_MAX = 4;
 
 type MonthlyRainfallStats = { rainfall_in: number; normal_in: number; anomaly_in: number; anomaly_pct: number | null };
 const SPI3_LABELS = ['D4', 'D3', 'D2', 'D1', 'D0', 'Near Normal', 'W0', 'W1', 'W2', 'W3', 'W4'] as const;
@@ -538,7 +538,7 @@ Highcharts: typeof Highcharts = Highcharts;
       yAxis: {
         min: 0,
         max: yMax,
-        tickInterval: extended ? undefined : 1,
+        tickInterval: extended ? fixedMax : 1,
         title: { text: 'Rainfall (in)', style: { color: extended ? highlight : undefined } },
         labels: { style: { color: extended ? highlight : undefined } },
         lineColor: extended ? highlight : undefined,
