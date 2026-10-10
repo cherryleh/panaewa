@@ -24,6 +24,9 @@ type WeatherVars = {
 };
 type RainfallHistoryPoint = { date: string; value: number | null };
 type MonthOption = { year: number; month: number; label: string };
+// Fixed top of the Rainfall History y-axis (inches); ~94% of months' wettest day fits under it
+const RAINFALL_HISTORY_Y_MAX = 5;
+
 type MonthlyRainfallStats = { rainfall_in: number; normal_in: number; anomaly_in: number; anomaly_pct: number | null };
 const SPI3_LABELS = ['D4', 'D3', 'D2', 'D1', 'D0', 'Near Normal', 'W0', 'W1', 'W2', 'W3', 'W4'] as const;
 type Spi3Label = typeof SPI3_LABELS[number];
@@ -517,10 +520,33 @@ Highcharts: typeof Highcharts = Highcharts;
 
     this.selectedMonthStats = this.monthlyStats.get(prefix) ?? null;
 
+    // Keep the y-axis fixed so months are comparable; if a day exceeds it, extend the
+    // axis and flag the change (orange axis + subtitle + dashed line at the usual max).
+    const fixedMax = RAINFALL_HISTORY_Y_MAX;
+    const monthMax = Math.max(0, ...data.filter((v): v is number => v !== null));
+    const extended = monthMax > fixedMax;
+    const yMax = extended ? Math.ceil(monthMax / fixedMax) * fixedMax : fixedMax; // round up to a multiple of the usual max
+    const highlight = '#d9480f';
+
     this.rangeChartOptions = {
       ...this.rangeChartOptions,
       title: { text: `Rainfall - ${selected.label}` },
+      subtitle: extended
+        ? { text: `⚠ Y-axis extended to ${yMax} in for this month (usually ${fixedMax} in)`, style: { color: highlight, fontWeight: 'bold' } }
+        : { text: undefined },
       xAxis: { ...(this.rangeChartOptions.xAxis as Highcharts.XAxisOptions), categories },
+      yAxis: {
+        min: 0,
+        max: yMax,
+        tickInterval: extended ? undefined : 1,
+        title: { text: 'Rainfall (in)', style: { color: extended ? highlight : undefined } },
+        labels: { style: { color: extended ? highlight : undefined } },
+        lineColor: extended ? highlight : undefined,
+        lineWidth: extended ? 2 : 0,
+        plotLines: extended
+          ? [{ value: fixedMax, color: highlight, dashStyle: 'Dash', width: 1.5, zIndex: 5, label: { text: `usual max (${fixedMax} in)`, align: 'right', style: { color: highlight } } }]
+          : []
+      },
       series: [
         { ...(this.rangeChartOptions.series?.[0] as Highcharts.SeriesColumnOptions), data }
       ]
